@@ -42,7 +42,7 @@ acs <- willbprocessed::read_data_directory("Data/ACS") %>%
       factor(levels = c("AAPI", "Black", "Hispanic", "White", "Other"))
   ) %>%
   # I reckon these will be helpful for looking at data quickly
-  group_by(city, race) %>%
+  group_by(city, race, race5) %>%
   #first population
   summarise(population = sum(n)) %>%
   group_by(city) %>%

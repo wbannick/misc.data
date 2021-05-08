@@ -1,0 +1,344 @@
+---
+title: "Bay Area Stops Analysis"
+output: html_document
+---
+
+```{r setup, include = F}
+library(tidyverse)
+library(willbprocessed)
+library(here)
+library(arrow)
+library(coefplot)
+# cleaned in scripts/clean_opp
+stops <- read_feather(here("Clean_Data/opp_bay_area.feather"))
+acs <- read_feather(here("Clean_Data/acs_bay_cities14.feather"))
+
+# 
+# stops %>% 
+#   select(year, city, date) %>%
+#   distinct() %>%
+#   group_by(year, city) %>%
+#   tally()
+# 
+
+# we're focusng on 2014 b/c its a year where all cities seem to have
+# complete data!
+stops <- filter(stops, year == 2014) %>%
+  mutate(
+    month = format(date, "%M"),
+    # there are some NAs for race let's make them other...
+    race5 = ifelse(is.na(race), "Other", as.character(race)) %>%
+      factor(levels = levels(race)),
+    season = case_when(
+      date < as.Date("2014-03-20") | 
+        date > as.Date("2014-12-20") ~ "Winter",
+      date >= as.Date("2014-03-20") & 
+        date < as.Date("2014-06-21") ~ "Spring",
+      date >= as.Date("2014-06-21") & 
+        date < as.Date("2014-09-22") ~ "Summer",
+      date >= as.Date("2014-09-22") & 
+        date < as.Date("2014-12-21") ~ "Spring",
+    )
+    )
+
+
+
+```
+
+```{r format_plot_data, include=F}
+#number of stops by city/race
+stops_by_race <- stops %>%
+  count(city, race5) %>%
+  group_by(city) %>%
+  mutate(
+    #for analysis/more precise bars in graphs
+    pct = (n/sum(n)) %>% as_percent(4),
+    #for labels :)
+    pct_label = (n/sum(n)) %>% as_percent(0, add_percent_sign = T),
+    statistic = "Stops"
+    )
+
+# population by city/race
+pop_by_race <- acs %>%
+  group_by(city, race5) %>%
+  summarise(n = sum(population)) %>%
+  group_by(city) %>%
+  mutate(
+    pct = (n/sum(n)) %>% as_percent(4), 
+    pct_label = (n/sum(n)) %>% as_percent(0, add_percent_sign = T),
+    statistic = "Population"
+  )
+
+# join together in data for our first plot...
+stops_by_pop <- stops_by_race %>%
+  bind_rows(pop_by_race)
+
+```
+
+```{r first_plot, echo=F, fig.width = 11, fig.height=6}
+# catchy
+pop_stop_plot <- ggplot(data = stops_by_pop) +
+  # bar plot
+  geom_bar(
+    stat = "identity", 
+    aes(x = race5, y = pct, fill = statistic),
+    position = "dodge"
+    ) + 
+  facet_wrap( ~ city) +
+  # found these via color brewer
+  scale_fill_manual(values = c("#1b9e77", "#d95f02")) +
+  scale_y_continuous(
+    # let's make em percent signs
+    labels = function(x) paste0(x, "%"),
+    # and break by 10
+    breaks = seq(0, 60, by = 10)  
+    ) +
+  # actually na maybe cluttered
+  # geom_text(
+  #   aes(x = race5, y = pct + 3, label = pct_label, group = statistic),
+  #   position = "fill",
+  #   color = "black", fontface = "bold"
+  # ) + 
+  theme_bw() +
+  theme(
+    legend.position = "top",
+    # I don't like legend titles haha
+    legend.title = element_blank(),
+    plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+    #text = element_text("Arial")
+  ) +
+  labs(title = "Population and Stops by Race", x = "", y = "")
+
+pop_stop_plot
+
+```
+
+```{r rate_data, echo=F}
+
+stop_rate <- stops_by_pop %>%
+  select(-pct_label, -n) %>%
+  pivot_wider(names_from = "statistic", values_from = pct) %>%
+  mutate(
+    rate = Stops/Population,
+    rate_label = round(rate,2),
+    #different color for rates over 1 because that shouldn't happen
+    rate_color = ifelse(rate >1, "#ED6925FF", "#781C6DFF"),
+    race = factor(race5, levels = rev(levels(race5)))
+    ) %>%
+  # let's drop Other just b/c its going to distort the plots
+  filter(race5 != "Other")
+
+```
+
+```{r second_plot, echo=F, fig.width = 11, fig.height=6}
+
+stop_rate_plot <- ggplot(data = stop_rate) +
+  # basically a dot and a line
+  # so the dot
+  geom_point(
+    aes(x = race, y = rate, color = rate_color),
+    size = 3
+    ) + 
+  # the line
+  geom_bar(
+    stat = "identity",
+    aes(x = race, y = rate, fill = rate_color),
+    position = "dodge",
+    # more of a line than a bar...
+    width = 0.2
+    ) +
+  # think it'll look better like this...
+  coord_flip() +
+  facet_wrap( ~ city, ncol = 1) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "grey") +
+  # found these via viridis inferno
+  scale_color_manual(values = stop_rate$rate_color) +
+  scale_fill_manual(values = stop_rate$rate_color) +
+  # less space below 0
+  scale_y_continuous(expand = c(.015,.015)) +
+  # let's add a label
+  geom_text(
+    aes(x = race, y = rate + .1, label = rate_label),
+    color = "black", fontface = "bold"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
+  labs(
+    title = "Stop Rate",
+    subtitle = "Proportion of Stops / Proportion of Population",
+    x = "", y = "")
+
+stop_rate_plot
+
+```
+
+
+note black disparity and hisp in SJ, add note about breakdown of latino within each
+
+```{r outcome_data, echo=F, warning=F}
+# let's do % of each that had each outcome
+outcomes <- stops %>%
+  group_by(city, race5) %>%
+  summarize(
+    Arrest = mean(I(arrest_made == TRUE), na.rm = T) %>%
+      as_percent(2),
+    Citation =  mean(I(citation_issued == TRUE), na.rm = T) %>%
+      as_percent(2),
+    # lot of missingness. let's skip
+    #pct_warning = mean(I(warning_issued == TRUE), na.rm = T),
+    #  as_percent(2)),
+    # some missingness in sj
+    Search = mean(I(search_conducted == TRUE), na.rm = T) %>%
+      as_percent(2),
+    ) %>%
+  pivot_longer(
+    cols = matches("^[A-Z]", ignore.case = F), 
+    names_to = "outcome",
+    values_to = "pct"
+    ) %>%
+  mutate(
+    pct_label = round(pct, 1) %>% paste0("%"),
+    outcome = factor(outcome, levels = c("Arrest", "Search", "Citation"))
+  )
+
+```
+
+```{r outcome_plot_fxn, include=F}
+
+outcome_plot <- function(df, city_name){
+  df %>%
+    filter(
+      # we're doing a seperate plot by city
+      city == city_name, 
+      # dropping citations for plots but maybe asians cited at higher rates. 
+      # come back to this
+      outcome != "Citation"
+      ) %>%
+    ggplot() +
+    # bar plot
+    geom_bar(
+      stat = "identity", 
+      aes(x = race5, y = pct),
+      fill = "#1f78b4"
+    ) + 
+  facet_wrap( ~ outcome) +
+  scale_y_continuous(
+    # let's make em percent signs
+    labels = function(x) paste0(x, "%"),
+    # and break by 10
+    breaks = seq(0, 60, by = 10),
+    limits = c(0,45)
+    ) +
+  # spread this out so we could do labels
+  geom_text(
+    aes(x = race5, y = pct + 3, label = pct_label),
+    color = "black", fontface = "bold"
+  ) +
+  theme_bw() +
+  theme(
+    legend.title = element_blank(),
+    # a little smaller
+    plot.title = element_text(size = 15, hjust = 0.5, face = "bold")
+  ) +
+  labs(title = city_name, x = "", y = "")
+  
+}
+
+```
+
+note disparity within cities as well as how many more searches and arrests in cities with more black and brown people
+
+```{r third_plots, echo=F, fig.width = 11, fig.height=4}
+# plots!
+outcome_plot(outcomes, "Oakland")
+outcome_plot(outcomes, "San Francisco")
+outcome_plot(outcomes, "San Jose")
+```
+
+```{r models, include=F}
+# basically a bunch of dummies to save time re-labeling plots lol
+stops_model_data <- select(stops, city, arrest_made, search_conducted) %>%
+  bind_cols(willbprocessed::factor_to_dummies(stops$race5)) %>%
+  bind_cols(willbprocessed::factor_to_dummies(factor(stops$gender))) %>%
+  bind_cols(willbprocessed::factor_to_dummies(factor(stops$season))) %>%
+  bind_cols(willbprocessed::factor_to_dummies(factor(stops$type))) %>%
+  rename("Pedestrian" = "pedestrian")
+
+outcome_models <- function(df, city_name){
+  # just the city in question
+  tmp <- filter(df, city == city_name)
+  # will be the same independent vars so ...
+  out_models <- map(c("arrest_made", "search_conducted"), function(var_name){
+    glm(
+      # change to black, whit hisp + male + summer + winter
+      tmp[[var_name]] ~ Black + Hispanic + White + Male + Summer + Winter,
+      data = tmp,
+      family = quasibinomial(link = "logit")
+      )
+  })
+  names(out_models) <- c("Arrest", "Search")
+  return(out_models)
+  
+  
+}
+
+oak_models <- outcome_models(stops_model_data, "Oakland")
+sf_models <- outcome_models(stops_model_data, "San Francisco")
+# sj instead of gender use type
+# sj_models <- outcome_models(stops, "San Jose")
+sj_models <- map(c("arrest_made", "search_conducted"), function(var_name){
+  tmp <- filter(stops_model_data, city == "San Jose")
+  glm(
+      # no gender buuuut stop type for most people so we'll do that
+      tmp[[var_name]] ~ Black + Hispanic + White + Summer + Winter + Pedestrian,
+      data = tmp,
+      family = quasibinomial(link = "logit")
+      )})
+
+names(sj_models) <- c("Arrest", "Search")
+
+```
+
+```{r coef_plot_fxn, include=F}
+
+outcome_coef_plot <- function(city_model, city_name){
+
+  coefplot::multiplot(city_model,
+                      innerCI = 1, 
+                      outerCI = 2,
+                      sort = "magnitude", 
+                      legend.reverse = T,
+                      lwdOuter = 1,
+                      lwdInner = 2,
+                      single = F,
+                      zeroColor = "black",
+                      zeroLWD = 1.5,
+                      zeroType = 2,
+                      xlab = "",
+                      ylab = "",
+                      title =  city_name) +
+    scale_color_manual(values = c("#1f78b4", "#1f78b4"))+
+    scale_x_continuous(
+      #xlim = c(-3,3),
+      breaks = seq(-6, 3, by = 1) 
+    )+
+    xlim(-6,3) +
+    theme_bw() +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(size = 15, hjust = 0.5, face = "bold"))
+}
+```
+
+
+```{r coef_plots, echo=F, fig.width = 11, fig.height=3, message=F}
+
+outcome_coef_plot(oak_models, "Oakland")
+outcome_coef_plot(sf_models, "San Francisco")
+outcome_coef_plot(sj_models, "San Jose")
+
+```

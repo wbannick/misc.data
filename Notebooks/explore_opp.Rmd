@@ -85,6 +85,7 @@ pop_stop_plot <- ggplot(data = stops_by_pop) +
     position = "dodge"
     ) + 
   facet_wrap( ~ city) +
+  # almost did labels but i think that kinda clutters things
   # found these via color brewer
   scale_fill_manual(values = c("#1b9e77", "#d95f02")) +
   scale_y_continuous(
@@ -93,12 +94,6 @@ pop_stop_plot <- ggplot(data = stops_by_pop) +
     # and break by 10
     breaks = seq(0, 60, by = 10)  
     ) +
-  # actually na maybe cluttered
-  # geom_text(
-  #   aes(x = race5, y = pct + 3, label = pct_label, group = statistic),
-  #   position = "fill",
-  #   color = "black", fontface = "bold"
-  # ) + 
   theme_bw() +
   theme(
     legend.position = "top",
@@ -182,10 +177,15 @@ note black disparity and hisp in SJ, add note about breakdown of latino within e
 ```{r outcome_data, echo=F, warning=F}
 # let's do % of each that had each outcome
 outcomes <- stops %>%
+  # it seems pedestrian stops are very different in terms of these outcomes
+  filter(type == "vehicular") %>%
   group_by(city, race5) %>%
   summarize(
     Arrest = mean(I(arrest_made == TRUE), na.rm = T) %>%
       as_percent(2),
+    # did not end up using citations for plots
+    # but asians may becited at higher rates. racist stereotypes?
+    #come back to this
     Citation =  mean(I(citation_issued == TRUE), na.rm = T) %>%
       as_percent(2),
     # lot of missingness. let's skip
@@ -209,14 +209,11 @@ outcomes <- stops %>%
 
 ```{r outcome_plot_fxn, include=F}
 
-outcome_plot <- function(df, city_name){
+outcome_plot <- function(df, outcome_name, y_lims, label_adj){
   df %>%
     filter(
-      # we're doing a seperate plot by city
-      city == city_name, 
-      # dropping citations for plots but maybe asians cited at higher rates. 
-      # come back to this
-      outcome != "Citation"
+      # we're doing a seperate plot by outcome
+      outcome == outcome_name, 
       ) %>%
     ggplot() +
     # bar plot
@@ -225,17 +222,17 @@ outcome_plot <- function(df, city_name){
       aes(x = race5, y = pct),
       fill = "#1f78b4"
     ) + 
-  facet_wrap( ~ outcome) +
+  facet_wrap( ~ city) +
   scale_y_continuous(
     # let's make em percent signs
     labels = function(x) paste0(x, "%"),
     # and break by 10
     breaks = seq(0, 60, by = 10),
-    limits = c(0,45)
+    limits = y_lims
     ) +
   # spread this out so we could do labels
   geom_text(
-    aes(x = race5, y = pct + 3, label = pct_label),
+    aes(x = race5, y = pct + label_adj, label = pct_label),
     color = "black", fontface = "bold"
   ) +
   theme_bw() +
@@ -244,8 +241,11 @@ outcome_plot <- function(df, city_name){
     # a little smaller
     plot.title = element_text(size = 15, hjust = 0.5, face = "bold")
   ) +
-  labs(title = city_name, x = "", y = "")
-  
+  labs(
+    title = 
+      paste0("Percent of Vehicular Stops that Resulted in ", outcome_name),
+    x = "",
+    y = "")
 }
 
 ```
@@ -254,9 +254,9 @@ note disparity within cities as well as how many more searches and arrests in ci
 
 ```{r third_plots, echo=F, fig.width = 11, fig.height=4}
 # plots!
-outcome_plot(outcomes, "Oakland")
-outcome_plot(outcomes, "San Francisco")
-outcome_plot(outcomes, "San Jose")
+outcome_plot(outcomes, "Arrest", y_lims = c(0,10), label_adj = 1)
+outcome_plot(outcomes, "Search", y_lims = c(0,35), label_adj = 3)
+
 ```
 
 ```{r models, include=F}
@@ -266,40 +266,12 @@ stops_model_data <- select(stops, city, arrest_made, search_conducted) %>%
   bind_cols(willbprocessed::factor_to_dummies(factor(stops$gender))) %>%
   bind_cols(willbprocessed::factor_to_dummies(factor(stops$season))) %>%
   bind_cols(willbprocessed::factor_to_dummies(factor(stops$type))) %>%
+  bind_cols(willbprocessed::factor_to_dummies(factor(stops$city))) %>%
   rename("Pedestrian" = "pedestrian")
 
-outcome_models <- function(df, city_name){
-  # just the city in question
-  tmp <- filter(df, city == city_name)
-  # will be the same independent vars so ...
-  out_models <- map(c("arrest_made", "search_conducted"), function(var_name){
-    glm(
-      # change to black, whit hisp + male + summer + winter
-      tmp[[var_name]] ~ Black + Hispanic + White + Male + Summer + Winter,
-      data = tmp,
-      family = quasibinomial(link = "logit")
-      )
-  })
-  names(out_models) <- c("Arrest", "Search")
-  return(out_models)
-  
-  
-}
-
-oak_models <- outcome_models(stops_model_data, "Oakland")
-sf_models <- outcome_models(stops_model_data, "San Francisco")
-# sj instead of gender use type
-# sj_models <- outcome_models(stops, "San Jose")
-sj_models <- map(c("arrest_made", "search_conducted"), function(var_name){
-  tmp <- filter(stops_model_data, city == "San Jose")
-  glm(
-      # no gender buuuut stop type for most people so we'll do that
-      tmp[[var_name]] ~ Black + Hispanic + White + Summer + Winter + Pedestrian,
-      data = tmp,
-      family = quasibinomial(link = "logit")
-      )})
-
-names(sj_models) <- c("Arrest", "Search")
+# Originaly had models by city but changed it to one model for all vehicle
+# stops in Oak/SF Ccuz pedestrian stops seemed pretty different on arrest +
+# search and sj had no gender data
 
 ```
 
@@ -337,8 +309,8 @@ outcome_coef_plot <- function(city_model, city_name){
 
 ```{r coef_plots, echo=F, fig.width = 11, fig.height=3, message=F}
 
-outcome_coef_plot(oak_models, "Oakland")
-outcome_coef_plot(sf_models, "San Francisco")
-outcome_coef_plot(sj_models, "San Jose")
+# outcome_coef_plot(oak_models, "Oakland")
+# outcome_coef_plot(sf_models, "San Francisco")
+# outcome_coef_plot(sj_models, "San Jose")
 
 ```

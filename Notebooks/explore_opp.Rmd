@@ -13,14 +13,6 @@ library(coefplot)
 stops <- read_feather(here("Clean_Data/opp_bay_area.feather"))
 acs <- read_feather(here("Clean_Data/acs_bay_cities14.feather"))
 
-# 
-# stops %>% 
-#   select(year, city, date) %>%
-#   distinct() %>%
-#   group_by(year, city) %>%
-#   tally()
-# 
-
 # we're focusng on 2014 b/c its a year where all cities seem to have
 # complete data!
 stops <- filter(stops, year == 2014) %>%
@@ -29,6 +21,7 @@ stops <- filter(stops, year == 2014) %>%
     # there are some NAs for race let's make them other...
     race5 = ifelse(is.na(race), "Other", as.character(race)) %>%
       factor(levels = levels(race)),
+    # see if season has an effect...
     season = case_when(
       date < as.Date("2014-03-20") | 
         date > as.Date("2014-12-20") ~ "Winter",
@@ -109,7 +102,7 @@ pop_stop_plot
 ```
 
 ```{r rate_data, echo=F}
-
+# formatting data for next plot
 stop_rate <- stops_by_pop %>%
   select(-pct_label, -n) %>%
   pivot_wider(names_from = "statistic", values_from = pct) %>%
@@ -174,7 +167,7 @@ stop_rate_plot
 
 note black disparity and hisp in SJ, add note about breakdown of latino within each
 
-```{r outcome_data, echo=F, warning=F}
+```{r outcome_data, echo=F, message=F}
 # let's do % of each that had each outcome
 outcomes <- stops %>%
   # it seems pedestrian stops are very different in terms of these outcomes
@@ -261,56 +254,62 @@ outcome_plot(outcomes, "Search", y_lims = c(0,35), label_adj = 3)
 
 ```{r models, include=F}
 # basically a bunch of dummies to save time re-labeling plots lol
-stops_model_data <- select(stops, city, arrest_made, search_conducted) %>%
+stops_model_data <- select(stops, city, type, arrest_made, search_conducted) %>%
   bind_cols(willbprocessed::factor_to_dummies(stops$race5)) %>%
   bind_cols(willbprocessed::factor_to_dummies(factor(stops$gender))) %>%
   bind_cols(willbprocessed::factor_to_dummies(factor(stops$season))) %>%
-  bind_cols(willbprocessed::factor_to_dummies(factor(stops$type))) %>%
   bind_cols(willbprocessed::factor_to_dummies(factor(stops$city))) %>%
-  rename("Pedestrian" = "pedestrian")
+  # SJ missing gender data and pedestrian data only in SJ
+  filter(city %in% c("Oakland", "San Francisco"), type == "vehicular")
 
 # Originaly had models by city but changed it to one model for all vehicle
 # stops in Oak/SF Ccuz pedestrian stops seemed pretty different on arrest +
 # search and sj had no gender data
+out_models <- map(c("arrest_made", "search_conducted"), function(var_name){
+  glm(
+    # change to black, whit hisp + male + summer + winter
+    stops_model_data[[var_name]] ~ 
+      Black + Hispanic + White + Male + Oakland + Summer + Winter,
+    data = stops_model_data,
+    family = quasibinomial(link = "logit")
+    )
+})
+names(out_models) <- c("Arrest", "Search")
 
 ```
 
-```{r coef_plot_fxn, include=F}
 
-outcome_coef_plot <- function(city_model, city_name){
+```{r coef_plot, echo=F, fig.width = 11, fig.height=5, message=F}
 
-  coefplot::multiplot(city_model,
-                      innerCI = 1, 
-                      outerCI = 2,
-                      sort = "magnitude", 
-                      legend.reverse = T,
-                      lwdOuter = 1,
-                      lwdInner = 2,
-                      single = F,
-                      zeroColor = "black",
-                      zeroLWD = 1.5,
-                      zeroType = 2,
-                      xlab = "",
-                      ylab = "",
-                      title =  city_name) +
-    scale_color_manual(values = c("#1f78b4", "#1f78b4"))+
-    scale_x_continuous(
-      #xlim = c(-3,3),
-      breaks = seq(-6, 3, by = 1) 
-    )+
-    xlim(-6,3) +
-    theme_bw() +
-    theme(
-      legend.position = "none",
-      plot.title = element_text(size = 15, hjust = 0.5, face = "bold"))
-}
-```
-
-
-```{r coef_plots, echo=F, fig.width = 11, fig.height=3, message=F}
-
-# outcome_coef_plot(oak_models, "Oakland")
-# outcome_coef_plot(sf_models, "San Francisco")
-# outcome_coef_plot(sj_models, "San Jose")
+coefplot::multiplot(out_models,
+                    innerCI = 1, 
+                    outerCI = 2,
+                    sort = "magnitude", 
+                    legend.reverse = T,
+                    lwdOuter = 1,
+                    lwdInner = 2,
+                    single = F,
+                    zeroColor = "black",
+                    zeroLWD = 1.5,
+                    zeroType = 2,
+                    xlab = "",
+                    ylab = "",
+                    title =  
+                      "Coefficients of Vehicular Stop Models"
+                    ) +
+  scale_color_manual(values = c("#1f78b4", "#1f78b4")) +
+  scale_x_continuous(
+    breaks = seq(-6, 3, by = 1) 
+  ) +
+  xlim(-6,3) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5)
+    ) +
+  labs(subtitle = "Oakland and San Francisco")
 
 ```
+
+next up: plot of pop change

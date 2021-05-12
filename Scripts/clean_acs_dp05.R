@@ -58,5 +58,7 @@ clean_acs_dp05 <- function(directory_path, state_abb, include_files){
 
 acs14 <- clean_acs_dp05("Data/ACS", "CA", include_files = "2014")
 
+# acs19 <- clean_acs_dp05("Data/ACS", "CA", include_files = "2019")
+
 
 arrow::write_feather(acs14, "Clean_Data/acs_bay_cities14.feather")

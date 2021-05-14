@@ -313,3 +313,56 @@ coefplot::multiplot(out_models,
 ```
 
 next up: plot of pop change
+
+```{r format_19_pop_data, include=F}
+# may not end up using this so loading it here
+acs19 <- read_feather(here("Clean_Data/acs_bay_cities19.feather"))
+
+# population by city/race for 19 to mirror 14
+pop_by_race19 <- acs19 %>%
+  group_by(city, race5) %>%
+  summarise(n = sum(population)) %>%
+  group_by(city) %>%
+  mutate(
+    pct = (n/sum(n)) %>% as_percent(4), 
+    pct_label = (n/sum(n)) %>% as_percent(0, add_percent_sign = T),
+    statistic = "2019"
+  )
+
+
+pop_change_data <- pop_by_race %>%
+  bind_rows(pop_by_race19) %>%
+  mutate(statistic = recode(statistic, "Population" = "2014"))
+
+```
+
+```{r pop_plot, echo=F, fig.width = 11, fig.height=6}
+
+pop_change_plot <- ggplot(data = pop_change_data) +
+  # bar plot
+  geom_bar(
+    stat = "identity", 
+    aes(x = race5, y = pct, fill = statistic),
+    position = "dodge"
+    ) + 
+  facet_wrap( ~ city) +
+  # found these via color brewer
+  scale_fill_manual(values = c("#1b9e77", "#7570b3")) +
+  scale_y_continuous(
+    # let's make em percent signs
+    labels = function(x) paste0(x, "%"),
+    # and break by 10
+    breaks = seq(0, 60, by = 10)  
+    ) +
+  theme_bw() +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank(),
+    plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+  ) +
+  labs(title = "Population 2014 vs 2019", x = "", y = "")
+
+pop_change_plot
+
+```
+

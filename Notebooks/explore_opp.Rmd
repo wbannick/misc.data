@@ -3,6 +3,10 @@ title: "Bay Area Stops Analysis"
 output: html_document
 ---
 
+
+Discriminatory racist policing afflicts all corners of the United States, including the San Francisco Bay area. This following brief analysis is intended to help visualize this issue for people who believe that “liberal” or “progressive” Bay Area cities are immune from the institutionalized racism that governs policing. It focuses on vehicle and pedestrian stops in the three major Bay Area cities of Oakland, San Francisco and San Jose in 2014. The stop data comes from the Stanford Open Policing Project. Population estimates are drawn from the American Community Survey (ACS). This analysis is not an exhaustive exploration of the data. It is a brief overview, visualization, and discussion of some of the more glaring disparities.
+
+
 ```{r setup, include = F}
 library(tidyverse)
 library(willbprocessed)
@@ -38,6 +42,7 @@ stops <- filter(stops, year == 2014) %>%
 
 ```
 
+
 ```{r format_plot_data, include=F}
 #number of stops by city/race
 stops_by_race <- stops %>%
@@ -67,6 +72,14 @@ stops_by_pop <- stops_by_race %>%
   bind_rows(pop_by_race)
 
 ```
+
+## Black People Are Stopped At Much Higher Rates than Non-Black People
+
+The plot below depicts the racial composition of the population of the three cities in 2014 as well as the racial composition of the recorded stops in 2014. San Francisco’s data only contains vehicular stops. Oakland seems to only contain vehicular stops as well, but there were some records that the OPP was unable to determine the stop type of. San Jose’s data includes pedestrian stops as well as vehicular.
+
+_maybe move this to intro_
+Both data sources have their flaws. American Community Surveys are conducted by the US Census Bureau and has some of the customary shortcomings in reporting one would expect from census data. The stop data comes from police data and is peppered with its own sorts of biases. In both sources it is likely that Black and Hispanic respondents may be underreported. And in one source race is self reported while in the other it is recorded by police officers. Flaws asinde an analysis of the data reveals some stark undisputable disparities.
+
 
 ```{r first_plot, echo=F, fig.width = 11, fig.height=6}
 # catchy
@@ -118,6 +131,12 @@ stop_rate <- stops_by_pop %>%
 
 ```
 
+Were racism not a factor in policing, one would expect the green and orange bars to be at similar levels. In particular the percent of police stops where Black people were stopped were much higher than the percent of the population of each city that were composed of Black people. This trend persists even in San Francisco and San Jose; cities with small Black populations. This means that Black people are much more likely to be stopped than Non-Black people in Bay Area Cities.
+_pick up here add note about breakdown of latino within each_
+Hispanic people are stopped at higher rates than other Non-Black residents in San Jose, but not in San Francisco or Oakland.
+_other and data flaws_
+
+
 ```{r second_plot, echo=F, fig.width = 11, fig.height=6}
 
 stop_rate_plot <- ggplot(data = stop_rate) +
@@ -165,7 +184,6 @@ stop_rate_plot
 ```
 
 
-note black disparity and hisp in SJ, add note about breakdown of latino within each
 
 ```{r outcome_data, echo=F, message=F}
 # let's do % of each that had each outcome

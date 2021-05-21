@@ -3,9 +3,28 @@ title: "Bay Area Stops Analysis"
 output: html_document
 ---
 
+<style type="text/css">
 
+h1 {
+  text-align: center;
+  color: #267CB9;
+  font-weight: bold;
+  font-family: 'Helvetica Neue';
+}
+
+h2 {
+ font-family: 'Helvetica Neue';
+}
+
+body{
+ font-family: 'Helvetica Neue';
+}
+
+</style>
+
+<br>
+<br>
 Discriminatory racist policing afflicts all corners of the United States, including the San Francisco Bay area. This following brief analysis is intended to help visualize this issue for people who believe that “liberal” or “progressive” Bay Area cities are immune from the institutionalized racism that governs policing. It focuses on vehicle and pedestrian stops in the three major Bay Area cities of Oakland, San Francisco and San Jose in 2014. The stop data comes from the Stanford Open Policing Project. Population estimates are drawn from the American Community Survey (ACS). This analysis is not an exhaustive exploration of the data. It is a brief overview, visualization, and discussion of some of the more glaring disparities.
-
 
 ```{r setup, include = F}
 library(tidyverse)
@@ -73,13 +92,14 @@ stops_by_pop <- stops_by_race %>%
 
 ```
 
-## Black People Are Stopped At Much Higher Rates than Non-Black People
+## Black People Stopped at Much Higher Rates
 
 The plot below depicts the racial composition of the population of the three cities in 2014 as well as the racial composition of the recorded stops in 2014. San Francisco’s data only contains vehicular stops. Oakland seems to only contain vehicular stops as well, but there were some records that the OPP was unable to determine the stop type of. San Jose’s data includes pedestrian stops as well as vehicular.
 
 _maybe move this to intro_
+<br>
 Both data sources have their flaws. American Community Surveys are conducted by the US Census Bureau and has some of the customary shortcomings in reporting one would expect from census data. The stop data comes from police data and is peppered with its own sorts of biases. In both sources it is likely that Black and Hispanic respondents may be underreported. And in one source race is self reported while in the other it is recorded by police officers. Flaws asinde an analysis of the data reveals some stark undisputable disparities.
-
+<br>
 
 ```{r first_plot, echo=F, fig.width = 11, fig.height=6}
 # catchy
@@ -106,7 +126,7 @@ pop_stop_plot <- ggplot(data = stops_by_pop) +
     # I don't like legend titles haha
     legend.title = element_blank(),
     plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
-    #text = element_text("Arial")
+    text = element_text("Helvetica Neue")
   ) +
   labs(title = "Population and Stops by Race", x = "", y = "")
 
@@ -131,10 +151,10 @@ stop_rate <- stops_by_pop %>%
 
 ```
 
-Were racism not a factor in policing, one would expect the green and orange bars to be at similar levels. In particular the percent of police stops where Black people were stopped were much higher than the percent of the population of each city that were composed of Black people. This trend persists even in San Francisco and San Jose; cities with small Black populations. This means that Black people are much more likely to be stopped than Non-Black people in Bay Area Cities.
-_pick up here add note about breakdown of latino within each_
-Hispanic people are stopped at higher rates than other Non-Black residents in San Jose, but not in San Francisco or Oakland.
-_other and data flaws_
+Were racism not a factor in policing, one would expect the green and orange bars to be at similar levels. In particular the percent of police stops where Black people were stopped were much higher than the percent of the population of each city that were composed of Black people. This trend persists even in San Francisco and San Jose; cities with small Black populations. This means that Black people are much more likely to be stopped than Non-Black people in Bay Area Cities. 
+
+The second plot helps reinforce these patterns. This “stop rate” is the ratio of the racial composition of all reported stops in 2014 to the racial composition of each city’s population in 2014. In a world where policing was not racially biased, the stop rate would be one in each case. This is represented by the dotted line. I did not calculate stop rate as stops per one hundred people, because some data includes vehicular data only while some also includes pedestrian data, and it is not completely clear if some cases are vehicular or pedestrian data in San Francisco. This calculation also focuses on inequalities within cities while also using a scale generalizable for easy comparisons across all three. It highlights the differences in likelihood of one racial group being stopped relative to another group and not different overall rates across cities.
+<br>
 
 
 ```{r second_plot, echo=F, fig.width = 11, fig.height=6}
@@ -172,7 +192,8 @@ stop_rate_plot <- ggplot(data = stop_rate) +
   theme(
     legend.position = "none",
     plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
-    plot.subtitle = element_text(hjust = 0.5)
+    plot.subtitle = element_text(hjust = 0.5),
+    text = element_text("Helvetica Neue")
   ) +
   labs(
     title = "Stop Rate",
@@ -182,6 +203,14 @@ stop_rate_plot <- ggplot(data = stop_rate) +
 stop_rate_plot
 
 ```
+
+The stop rate plot further highlights discriminatory policing of Black Bay Area residents. In Oakland where the Black population is large, the stop rate for Black respondents is 2.32 and they are stopped at a 4.46 higher rate than white Oakland residents. While San Francisco has a much smaller Black population, the stop ratio for Black residents living in the city is 2.83, and Black residents were 3.14 times as likely to be stopped as white residents. San Jose ahs the smallest Black population of all three Bay Area cities but Black San Jose residents are stopped at the higest rate of Black people in the bay relative to all stops in the city. Their stop rate is over 3 and they are 4.78 times as likely to be stopped as White people in San Jose.
+
+Hispanic people are stopped at higher rates than other Non-Black residents in San Jose, but not in San Francisco or Oakland. Race is difficult to measure and it is difficult to determine how a Black, Brown or white latinx individual may be coded by police in the stop data. Different stereotypes within Hispanic ethnic groups may help explain some of these differences. That said there is inconclusive proof in the data. 
+
+In 2014, San Jose’s Hispanic population was 87% Mexican American while Oakland’s is about 70% Mexican and San Francisco’s population is about 51% Mexican. Fifty percent of San Jose’s Hispanic population was white, while about 37% of oaklands was and about 43% of San Francisco's was. Neither of these proportions alone can explain why rates between the three cities are different, but perhaps they are a part of the story. Perhaps there are more answers in how police report race data of those they stop.
+
+Particularly curious is how much larger the proportion of stops of those whose is race is coded as other is than the proportion of those whose race is coded as other in the ACS data in San Francisco and San Jose. I did not request the source data from the OPP to see how if it could help illuminate the composition of those coded as Other. It is unclear to me, for example, if perhaps police officers listed people who’s race they were unsure about as “Other” or if those who were coded as Other belonged to unlisted racial groups. Were I dig into this data further, I would like to focus more attention to this.
 
 
 
@@ -250,7 +279,8 @@ outcome_plot <- function(df, outcome_name, y_lims, label_adj){
   theme(
     legend.title = element_blank(),
     # a little smaller
-    plot.title = element_text(size = 15, hjust = 0.5, face = "bold")
+    plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
+    text = element_text("Helvetica Neue")
   ) +
   labs(
     title = 
@@ -261,14 +291,24 @@ outcome_plot <- function(df, outcome_name, y_lims, label_adj){
 
 ```
 
-note disparity within cities as well as how many more searches and arrests in cities with more black and brown people
+## Black and Hispanic People More Likely To Be Searched and Arrested
+
+Next, I turn to the outcome of stops. For this section, I focus on vehicular stops, because stop rates for pedestrian stops were significantly different. This section focuses on what happens to motorists once they are stopped, and finds that Black and Hispanic motorists are more likely to be both searched and arrested than are Asian or White motorists.
+<br>
 
 ```{r third_plots, echo=F, fig.width = 11, fig.height=4}
 # plots!
-outcome_plot(outcomes, "Arrest", y_lims = c(0,10), label_adj = 1)
 outcome_plot(outcomes, "Search", y_lims = c(0,35), label_adj = 3)
+outcome_plot(outcomes, "Arrest", y_lims = c(0,10), label_adj = 1)
 
 ```
+
+In Oakland and San Francisco, Black respondents are much more likely to be searched and arrested than Hispanic respondents, but in San Jose the rates are similar. This again speaks to more discriminatory policing against Hispanic people in San Jose than in Oakland or San Francisco. Yet, across the Bay it is clear that discrimination not only happens in deciding who to stop, but how stops are conducted. 
+
+Search and arrest rates are also generally higher in Oakland and San Jose than San Francisco. Perhaps policy officers feel more unsafe in areas with higher populations of Black and Brown people and are more likely to search and arrest people of any race in these areas than they would in other areas. As for much of this analysis neighborhood data would be helpful here.
+
+I have seen others argue that an evaluation of whether or not a stop is discriminatory should take into account. 
+
 
 ```{r models, include=F}
 # basically a bunch of dummies to save time re-labeling plots lol
@@ -283,7 +323,7 @@ stops_model_data <- select(stops, city, type, arrest_made, search_conducted) %>%
 # Originaly had models by city but changed it to one model for all vehicle
 # stops in Oak/SF Ccuz pedestrian stops seemed pretty different on arrest +
 # search and sj had no gender data
-out_models <- map(c("arrest_made", "search_conducted"), function(var_name){
+out_models <- map(c("search_conducted", "arrest_made"), function(var_name){
   glm(
     # change to black, whit hisp + male + summer + winter
     stops_model_data[[var_name]] ~ 
@@ -292,7 +332,7 @@ out_models <- map(c("arrest_made", "search_conducted"), function(var_name){
     family = quasibinomial(link = "logit")
     )
 })
-names(out_models) <- c("Arrest", "Search")
+names(out_models) <- c("Search", "Arrest")
 
 ```
 
@@ -324,7 +364,8 @@ coefplot::multiplot(out_models,
   theme(
     legend.position = "none",
     plot.title = element_text(size = 15, hjust = 0.5, face = "bold"),
-    plot.subtitle = element_text(hjust = 0.5)
+    plot.subtitle = element_text(hjust = 0.5),
+    text = element_text("Helvetica Neue")
     ) +
   labs(subtitle = "Oakland and San Francisco")
 

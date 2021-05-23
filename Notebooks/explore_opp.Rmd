@@ -404,4 +404,4 @@ Finally, these patterns do not stop at racist policing. There are many other iss
 
 _If you have questions, please email me at will.bannick@gmail.com. I tried to keep this post brief, and in the process omitted many details. You can find the data and scripts I used on my github._
 
-
+_William Bannick - 2021-05-23_

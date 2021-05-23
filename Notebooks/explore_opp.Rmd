@@ -24,13 +24,15 @@ body{
 
 <br>
 <br>
-Policing in Bay Area cities is racist and discriminatory. The following is a brief discussion of trends found in police data to help visualize this reality. It is not an exhaustive exploration of the data, but it is a discussion of some of the more glaring disparities.
 
-In my experience many white families and educators from liberal areas latch on to notions that racism and discriminatory systems are much worse in other regions of the country. I believe this serves as a way to detach oneself from responsibility and blame and project it onto other people, all the while excusing ignorance and apathy. I hope that information and discussions such as those in this brief post can help us reflect more honestly with the areas and systems we interact with locally as well as nationally.
+Policing in Bay Area cities is racist and discriminatory. The following analysis is not an exhaustive exploration of this topic. Rather, it is an overview of some of the more glaring disparities found in openly available data.
+
+In my experience, many white families and educators from liberal areas latch on to notions that racism and discriminatory systems are far more severe in other regions of the country. I believe this serves as a way to detach oneself from responsibility and blame, and project it onto other people, all the while excusing ignorance and apathy. I hope that posts such as this one can help us reflect more honestly with the areas and systems we interact with locally.
  
-The analysis in this post focuses on vehicle and pedestrian stops in the three major Bay Area cities of Oakland, San Francisco and San Jose. All data is from the year 2014. I gathered the data from this Stanford Open Policing Project. In the course of this analysis I also refer to population estimates from the 2014 American Community Survey (ACS). 
+The analysis in this post focuses on vehicle and pedestrian stops in the three major Bay Area cities of Oakland, San Francisco and San Jose. The data is from the year 2014. The data was collected by the Stanford Open Policing Project. In the course of this analysis I also refer to population estimates from the 2014 American Community Survey (ACS). 
 
-As is the case with all data, there are flaws and biases underlying our sources. Data can be dangerous because it is never unbiased or strictly factual, but it is often presented as such. For example the stop data used in this post is recorded by police officers and is thereby saddled with biases and conflicts of interests. American Community Surveys are conducted by the US Census Bureau which has a history of undercounting people of color, in particular Black Americans. In both sources it is likely that Black and Hispanic respondents may be underreported. Race is also measured differently in each resource. In one source race is self reported while in the other it is recorded by police officers. Comparing data from these resources is certainly not futile. The data reveals some stark undisputable disparities. But, as always with data science, it is important to remember the sources and their biases, and always be aware that there is room for error. 
+As is the case with all data, there are flaws and biases underlying each source. Data can be dangerous because it is never unbiased or strictly factual, but it is often presented as such. For example, the stop data I use was recorded by police officers and is thereby saddled with biases and conflicts of interests. Furthermore, American Community Surveys are conducted by the US Census Bureau which has a history of undercounting people of color, particularly Black Americans. So it seems likely that Black people in particular might be underrepresented in each resource. Race is also measured differently in each resource. In one source race is self reported while in the other it is recorded by police officers. Even so, comparing data from these resources is not futile. The data reveals some stark undisputable disparities. But, as always with data science, it is important to remember the sources and their biases, and always be aware that there is room for error. 
+
 
 
 ```{r setup, include = F}
@@ -106,8 +108,7 @@ stops_by_pop <- stops_by_race %>%
 
 ## Black People Stopped at Much Higher Rates
 
-The plot below depicts the racial composition of the population of Oakland, San Francisco, and San Jose in 2014 as well as the racial composition of the recorded stops in 2014. San Francisco’s data only contains vehicular stops. Almost all of Oakland’s data pertains to vehicular stops as well, but there are some rows that remain uncoded. San Jose’s data includes pedestrian stops as well as vehicular stops.
-
+The plot below depicts the racial composition of the population of Oakland, San Francisco, and San Jose in 2014 as well as the racial composition of the recorded stops in 2014. San Francisco’s data only contains vehicular stops. Almost all of Oakland’s data pertains to vehicular stops as well, but there are some rows that remain uncoded and may correspond to either vehicular or pedestrian stops. San Jose’s data includes pedestrian stops as well as vehicular stops.
 <br>
 <br>
 
@@ -161,11 +162,11 @@ stop_rate <- stops_by_pop %>%
 
 ```
 
-Were racism not a factor in policing, one would expect the green and orange bars to be at similar levels, but they are not. In particular, Black people are over represented in the stop data relative to the populations in each city. In other words, Black people are much more likely to be stopped than Non-Black people in Bay Area Cities. This trend persists even in San Francisco and San Jose, which have relatively small Black populations.
+Were racism not a factor in policing, one would expect the green and orange bars to be at similar levels. They are not. In particular, Black people are over represented in the stop data relative to the population of each city. In other words, Black people are much more likely to be stopped than non-Black people in Bay Area Cities. This trend persists even in San Francisco and San Jose, which have relatively small Black populations.
 
-The second plot helps reinforce these patterns. This “stop rate” is the ratio of the racial composition of all reported stops in 2014 to the racial composition of each city’s population in 2014. In a world where policing were not racially biased, the stop rate would be exactly one in each case. This is represented by the dotted line.
+The second plot reinforces these patterns. The “stop rate” is the ratio of the racial composition of all reported stops in 2014 to the racial composition of each city’s population in 2014. In a world where policing were not racially biased, the stop rate would be exactly one in each case. This is represented by the dotted line.
 
-Stop rates are often calculated as stops per 100 people, but I chose to calculate the stop rate in this manner because some data includes pedestrian stops and some does not. This calculation also focuses on inequalities within cities while also using a scale generalizable for easy comparisons across all three. It highlights the differences in likelihood of one racial group being stopped relative to another group and not rates across cities.
+Stop rates are often calculated as stops per 100 people. I chose a different method because some cities include pedestrian stops and some do not. This calculation also focuses on inequalities within cities while also using a scale generalizable for easy comparisons of relative discrimination across all three.
 <br>
 <br>
 
@@ -217,13 +218,13 @@ stop_rate_plot
 
 ```
 
-The stop rate plot further highlights discriminatory policing of Black Bay Area residents. In Oakland, where the Black population is relatively large, the stop rate for Black respondents is 2.32 and they are stopped at a 4.46 higher rate than white Oakland residents. While San Francisco has a much smaller Black population, the stop ratio for Black residents living in the city is 2.83, and Black residents were 3.14 times as likely to be stopped as white residents. San Jose has the smallest Black population of all three Bay Area cities, but the stop rate for Black San Jose residents is over 3 and they are 4.78 times as likely to be stopped as white people in San Jose.
+The stop rate plot further highlights discriminatory policing of Black Bay Area residents. In Oakland, where the Black population is relatively large, the stop rate for Black people is 2.32, and they are stopped at a 4.46 higher rate than white Oakland residents. While San Francisco has a much smaller Black population, the stop ratio for Black people in “The City” is 2.83, and Black residents were 3.14 times as likely to be stopped as white residents. San Jose has the smallest Black population of all three Bay Area cities, but the stop rate for Black people in San Jose is over 3 and they are 4.78 times as likely to be stopped as white people in San Jose.
 
-Hispanic people are stopped at higher rates than other Non-Black people in San Jose, but this is not the case in San Francisco or Oakland. Race is difficult to measure and it is difficult to determine how a Black, Brown or white latinx individual may be coded by police in the stop data. It is also measured differently in each data source. So teasing out why stop rates look different for Hispanic people in different cities is difficult. Different stereotypes within Hispanic ethnic groups may help explain some of these differences. That said there is inconclusive proof in the data. 
+Hispanic people are stopped at higher rates than other Non-Black people in San Jose, but this is not the case in San Francisco or Oakland. Race is difficult to measure and it is difficult to determine how a Black, Brown, or white latinx individual may be coded by police in the stop data. Race is also measured differently in each data source. So teasing out why stop rates look different for Hispanic people in different cities is difficult. Different stereotypes within Hispanic ethnic groups may help explain some of these differences, but it is difficult to discern with the data we have. 
 
-In 2014, San Jose’s Hispanic population was 87% Mexican American while Oakland’s was about 70% Mexican American and San Francisco’s population was about 51% Mexican American. Fifty percent of San Jose’s Hispanic population was white, while about 37% of Oakland’s was white and about 43% of San Francisco's was white. These statistics alone fail to explain why stop rates of Hispanic Americans between the three cities are different, but perhaps they are a part of the story.
+In 2014, San Jose’s Hispanic population was 87% Mexican American while Oakland’s was about 70% Mexican American and San Francisco’s population was about 51% Mexican American. Fifty percent of San Jose’s Hispanic population was white, while about 37% of Oakland’s was white and about 43% of San Francisco's was white. These statistics alone fail to explain why stop rates of Hispanic Americans between the three cities are different, but perhaps they are a part of the story and an entry point for further analysis.
 
-Finally, I encourage the reader to take a look at the “Other” columns in the first plot. There are a surprising number of people whose race is coded as “Other” in the stop data. There is very little raw race data in the cleaned OPP files for these cities, and I did not request the source data from the OPP. Perhaps police officers listed people whose race they were unsure about as “Other.” Or perhaps those coded as Other belonged to unlisted racial groups that are stopped at very high rates. This is an area that could use further investigation.
+Finally, I encourage the reader to take a look at the “Other” columns in the first plot. There are a surprising number of people whose race is coded as “Other” in the stop data. There is very little raw race data in the cleaned OPP files for these cities, and I did not request the source data from the OPP. Perhaps police officers listed people whose race they were unsure about as “Other.” Or perhaps those coded as “Other” belonged to unlisted racial groups that are stopped at very high rates. This is an area that could use further investigation.
 
 
 ```{r outcome_data, echo=F, message=F}
@@ -305,7 +306,7 @@ outcome_plot <- function(df, outcome_name, y_lims, label_adj){
 
 ## Black and Hispanic People More Likely To Be Searched and Arrested
 
-Next, I turn to the outcome of stops. For this section, I focus on vehicular stops, because arrest and search rates for pedestrian stops were significantly different from those for vehicular stops. This section focuses on what happens to motorists once they are stopped, and finds that Black and Hispanic motorists are more likely to be both searched and arrested than are Asian or white motorists.
+Next, I turn to the “outcome” of stops. For this section, I focus on vehicular stops, because arrest and search rates for pedestrian stops were significantly different from those for vehicular stops. This section focuses on what happens to motorists once they are stopped, and finds that Black and Hispanic motorists are more likely to be both searched and arrested than are Asian or white motorists.
 <br>
 <br>
 
@@ -316,11 +317,11 @@ outcome_plot(outcomes, "Arrest", y_lims = c(0,10), label_adj = 1)
 
 ```
 
-In Oakland and San Francisco, Black respondents are much more likely to be searched and arrested than Hispanic respondents, but in San Jose the rates are similar. This again suggests more discriminatory policing towards Hispanic people in San Jose than to towards those in Oakland or San Francisco. It is clear that discrimination not only happens in deciding who to stop, but how stops are conducted. 
+In Oakland and San Francisco, Black respondents are much more likely to be searched and arrested than Hispanic respondents, but in San Jose the rates are similar. This again suggests more discriminatory policing towards Hispanic people in San Jose than towards those in Oakland or San Francisco. It is clear that the discrimination patterns observed in the prior section also influence how stops are conducted. 
 
-Search and arrest rates are also generally higher in Oakland and San Jose than in San Francisco. Perhaps policy officers feel less safe in areas with higher populations of Black and Brown people and are therefore more likely to search and arrest people of any race in these areas than they would be in other areas. Neighborhood level data would be helpful to further explore this hypothesis. Most of the stop data in these cities does include the coordinates of the stop, so there are exciting possibilities for further analysis.
+Search and arrest rates are also generally higher in Oakland and San Jose than in San Francisco. Perhaps police officers feel less safe in areas with higher populations of Black and Brown people and are therefore more likely to search and arrest people of any race in these areas than they would be in other cities. Neighborhood level data would be helpful to further explore this hypothesis. Most of the stop data in these cities does include the coordinates of the stop, so there are exciting possibilities for further analysis.
 
-In an attempt to control for factors other than race and city, I ran two logistic regression models, the coefficients of which are plotted below. I dropped San Jose data from the models, because gender was not recorded in that data.
+In an attempt to control for factors other than race and city, I ran two logistic regression models, the coefficients of which are plotted below. I dropped San Jose data from the models, because gender was not recorded in that data. 
 <br>
 <br>
 
@@ -387,16 +388,20 @@ coefplot::multiplot(out_models,
 
 ```
 
-Ideally, I would like to introduce other independent variables into the model. In particular, I would include measures of age, income, and racial composition of the neighborhood in which the stop occurred. Since this data does have coordinates, there are opportunities to match stop data to finer level race, age, and wealth data.
+Ideally, I would like to introduce other independent variables into the model. For example, I would include measures of age and income, as well as a measure of racial composition of the neighborhood in which the stop occurred. Since this data does have coordinates, there are opportunities to match stop data to finer level race, age, and wealth data.
 
 While limited, these models do bolster our earlier findings. When gender, season, and city are controlled for, the coefficients with the greatest positive magnitudes are still indicator variables for being Black or Hispanic. So being Black, and to a lesser extent being Hispanic, are the factors shown to most dramatically increase one’s likelihood of being searched and arrested when they are subject to a traffic stop. People in Oakland are also more likely to be searched and arrested, as are men. A further analysis of interactions of some of these variables would be a logical next step.
 
-I have seen some argue discriminatory stop, search, and arrest patterns may not reflect racist policing if contraband was found in patterns that justify those rates. To put it plainly, I will not entertain these arguments which imply Black and Brown people are more likely to commit crimes, or be in the possession of drugs. Americans are constantly subject to racist stereotypes and portrayals that condition us. I believe this conditioning affects crucial decisions made by police officers such as the decision as to whether or not to search an individual, the decision as to what contraband is “acceptable”, the decision as to whether to warn or arrest an individual based on the contraband, and the decision as to whether or not to accurately record data from an encounter. Finally, it also affects the decision as to whether or not to plant or alter evidence. All of this is impossible to disentangle in the available data, and I believe focusing on it would be irresponsible.
+I have seen some argue discriminatory stop, search, and arrest patterns may not reflect racist policing if contraband was found in patterns that “justify” those rates. To put it plainly, I will not entertain these arguments because they imply Black and Brown people are more likely to commit crimes, or be in the possession of drugs. Americans are constantly subject to racist stereotypes and portrayals that condition us. I believe this conditioning affects crucial decisions made by police officers such as the decision as to whether or not to search an individual, the decision as to what contraband is “acceptable”, the decision as to whether to warn or arrest an individual based on the contraband, and the decision as to whether or not to accurately record data from an encounter. Finally, it also affects the decision as to whether or not to plant or alter evidence. All of this is impossible to disentangle in the available data, so I believe using data on the possession of contraband to assess the validity of stops would be irresponsible.
 
 ## Looking Forward
 
-There are many directions one could embark upon to continue this analysis, some of which I mentioned in the body of this text. I may return to this data in the future and dig deeper, but I hope this particular piece helped convey some of the more starking disparities in policing in Bay Area cities. I hope this also helps spark more critical reflection and a readiness to accept responsibility and work for change in the Bay Area and other communities where deflection and denial are encouraged. This does not stop at racist policing. There are many other issues in the Bay alone where the apathy of those with privilege is damaging the lives of those around them. For example, many wealthy white people in particular have been gentrifying sections of the Bay and displacing communities without remorse. Racism permeates American systems across the country, and there is work to be done everywhere.
+There are many directions one could embark upon to continue this analysis, some of which I mentioned in the body of this text. I may return to this data in the future and dig deeper, but I hope this particular piece helped convey some of the more stark disparities in policing in Bay Area cities. I hope this also helps spark more critical reflection and a readiness to accept responsibility and work for change in the Bay Area and other communities where deflection and denial are encouraged. 
 
-If you have questions, please email me at will.bannick@gmail.com. I tried to keep this post brief, and in the process omitted many details. You can find the data and scripts I used on my github. 
+Finally, these patterns do not stop at racist policing. There are many other issues in the Bay alone where the apathy of those with privilege is damaging the lives of those around them. For example, many wealthy white people in particular have been gentrifying sections of the Bay and displacing communities. Racism permeates American systems across the country, and there is much work to be done.
+<br>
+<br>
+
+_If you have questions, please email me at will.bannick@gmail.com. I tried to keep this post brief, and in the process omitted many details. You can find the data and scripts I used on my github._
 
 

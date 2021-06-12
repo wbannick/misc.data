@@ -1,0 +1,118 @@
+library(tidyverse)
+
+# found using documentation in the Documentation/Internment/102.1DP.pdf
+raw_data <- read_fwf("Data/Internment/RG210.JAPAN.WRA26.txt", 
+               skip = 42,
+               # there are more columns that could be used
+               fwf_cols(
+                 last_name = c(1,10),
+                 first_name = c(11,18),
+                 middle_name = c(19),
+                 relocation_center = c(20),
+                 assembly_center = c(21),
+                 residence = c(22,26),
+                 birth_country = c(27),
+                 age_in_japan = c(36),
+                 military = c(38),
+                 gender_marstat = c(45),
+                 race = c(46),
+                 birth_year = c(47,48),
+                 birth_place = c(49,50),
+                 educ = c(52),
+                 religion = c(54)
+                 )
+              )
+
+out_data <- raw_data %>%
+  transmute(
+    # RESIDENCE
+    residence_state = str_extract(residence,"[0-9]{2}") %>%
+      recode(
+        "11" = "Washington",  "12" = "Oregon", "13" = "California", 
+        "26" = "Arizona", "70" = "Hawaii", "71" = "Hawaii",
+        "72" = "Hawaii", "73" = "Hawaii", "74" = "Hawaii",
+        "81" = "Alaska"
+      ),
+    residence_state = ifelse(!str_detect(residence_state, "[A-z]"),
+                             "Other", residence_state) %>%
+      # order of number of people...
+      factor(levels = c("California", "Washington", "Oregon",
+                        "Hawaii", "Arizona", "Alaska", "Other")),
+    residence_area = str_extract(residence, "^.{3}") %>%
+      recode(
+        "131" = "Northwestern Coastal Hills and Valleys",
+        "132" = "Sierra and Northeastern Area",
+        "133" = "Sacramento Valley",
+        "134" = "Central Costal Hills and Valleys",
+        "135" = "San Joaquin River Valley",
+        "136" = "Santa Barbara-Ventura Area",
+        "137" = "Southeastern Desert and Irrigated Valleys",
+        "138" = "San Francisco-Oakland Metropolitan Counties",
+        "139" = "Sacramento Metropolitan County",
+        "13-" = "San Jose Metropolitan County",
+        "13&" = "San Diego Metropolitan County",
+        "130" = "Los Angeles Metropolitan Counties",
+        "121" = "Northwestern Area",
+        "122" = "Southwestern Area",
+        "123" = "Eastern Wheat Area",
+        "124" = "Eastern Irrigation and Grasing Area",
+        "125" = "Portland Metropolitan Counties",
+        "111" = "Western Slope",
+        "112" = "Western Slope (Inland)",
+        "113" = "Cental and Northeastern Area",
+        "114" = "Columbia Plateau Wheat Area",
+        "115" = "Seattle-Tacoma Metropolitan Counties",
+        "116" = "Spokane Metropolitan County"
+      ),
+    # if it still starts with a number we'll use state for now
+    residence_area = case_when(
+      str_detect(residence_area, "^[0-9]") ~ as.character(residence_state),
+      T ~ residence_area
+    ),
+    relocation_center = 
+      recode(
+        relocation_center,
+        "1" = "Manzanar", "2" = "Poston", "3" = "Gila River",
+        "4" = "Tule Lake", "5" = "Minidoka", "6" = "Topaz",
+        "7" = "Heart Mountain", "8" = "Granada", "9" = "Rohwer",
+        "0" = "Jerome"
+        ),
+    relocation_state = case_when(
+      relocation_center %in% c("Manzanar", "Tule Lake") ~ "California",
+      relocation_center %in% c("Gila River", "Poston") ~ "Arizona",
+      relocation_center %in% c("Minidoka") ~ "Idaho",
+      relocation_center %in% c("Topaz") ~ "Utah",
+      relocation_center %in% c("Heart Mountain") ~ "Wyoming",
+      relocation_center %in% c("Granada") ~ "Colorado",
+      relocation_center %in% c("Rohwer", "Jerome") ~ "Arkansas"
+    ),
+    bp = birth_place,
+    birth_place = case_when(
+      birth_place < 66 | (birth_place > 69 & birth_place < 75) ~ "United States",
+      birth_place > 89 & birth_place < 100 ~ "Japan",
+      birth_place > 79 & birth_place < 90 ~ "Other",
+      T ~ NA_character_
+    ) %>%
+      factor(levels = c("United States", "Japan", "Other"))
+  )
+
+
+
+# # not doing city... maybe county
+# county_xwalk <- tribble(
+#   ~residence_code, ~residence_county, ~residencs_subregion,
+#   1311, "Del Norte", "Northwestern Coastal Hills and Valleys",
+#   1312, "Humboldt",  "Northwestern Coastal Hills and Valleys",
+#   1313, "Lake", "Northwestern Coastal Hills and Valleys",
+#   1314, "Mondocino", "Northwestern Coastal Hills and Valleys",
+#   1315, "Napa", "Northwestern Coastal Hills and Valleys",
+#   1316, "Sonoma", "Northwestern Coastal Hills and Valleys",
+#   1317, "Trinity", "Northwestern Coastal Hills and Valleys",
+#   1321, "Alpine/Mono", "Sierra and Northeastern Area",
+#   1322, "Anador", "Sierra and Northeastern Area",
+#   1323, "Calaveras", "Sierra and Northeastern Area",
+#   1324, "El Dorado", "Sierra and Northeastern Area",
+#   1325, "Inyo", "Sierra and Northeastern Area",
+#   1326, "Lacson", "Sierra and Northeastern Area",
+# )
+

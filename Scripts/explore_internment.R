@@ -86,33 +86,37 @@ out_data <- raw_data %>%
       relocation_center %in% c("Granada") ~ "Colorado",
       relocation_center %in% c("Rohwer", "Jerome") ~ "Arkansas"
     ),
-    bp = birth_place,
     birth_place = case_when(
       birth_place < 66 | (birth_place > 69 & birth_place < 75) ~ "United States",
       birth_place > 89 & birth_place < 100 ~ "Japan",
       birth_place > 79 & birth_place < 90 ~ "Other",
       T ~ NA_character_
     ) %>%
-      factor(levels = c("United States", "Japan", "Other"))
+      factor(levels = c("United States", "Japan", "Other")),
+    # birthyear/age
+    #--------------
+    birth_year = str_trim(birth_year) %>% 
+      str_pad(width = 2, pad = "0", side = "left"),
+    birth_year = case_when(
+      birth_year == "SO" ~ NA_character_,
+      # eh not great... definitely room for error. could use other vars to help
+      birth_year < 43 ~ paste0("19", birth_year),
+      birth_year > 42 ~  paste0("18", birth_year)
+    ),
+    birth_year = as.integer(birth_year),
+    # seems to be year when started... we'll do this for approximations
+    age = 1942 - birth_year,
+    age5 = case_when(
+      age < 18 ~ "0-17",
+      age < 30 ~ "18-29",
+      age < 45 ~ "30-44",
+      age < 60 ~ "45-59",
+      age >= 60 ~ "60+"
+    ) %>%
+      factor(levels = c("0-17", "18-29", "30-44", "45-59", "60+"))
   )
 
 
 
-# # not doing city... maybe county
-# county_xwalk <- tribble(
-#   ~residence_code, ~residence_county, ~residencs_subregion,
-#   1311, "Del Norte", "Northwestern Coastal Hills and Valleys",
-#   1312, "Humboldt",  "Northwestern Coastal Hills and Valleys",
-#   1313, "Lake", "Northwestern Coastal Hills and Valleys",
-#   1314, "Mondocino", "Northwestern Coastal Hills and Valleys",
-#   1315, "Napa", "Northwestern Coastal Hills and Valleys",
-#   1316, "Sonoma", "Northwestern Coastal Hills and Valleys",
-#   1317, "Trinity", "Northwestern Coastal Hills and Valleys",
-#   1321, "Alpine/Mono", "Sierra and Northeastern Area",
-#   1322, "Anador", "Sierra and Northeastern Area",
-#   1323, "Calaveras", "Sierra and Northeastern Area",
-#   1324, "El Dorado", "Sierra and Northeastern Area",
-#   1325, "Inyo", "Sierra and Northeastern Area",
-#   1326, "Lacson", "Sierra and Northeastern Area",
-# )
+
 

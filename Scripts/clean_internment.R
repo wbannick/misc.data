@@ -129,6 +129,21 @@ out_data <- raw_data %>%
       age_in_japan %in% c("3", "5", "6", "7") ~ "20+",
       T ~ NA_character_
     ) %>% factor(levels = c("Never Lived in Japan", "0-9", "10-19", "20+")),
+    # Gender + Marstat
+    # -----------------
+    gender = case_when(
+      gender_marstat %in% c("1", "2", "3", "4", "5", "0") ~ "Man",
+      gender_marstat %in% c("6", "7", "8", "9", "-", "&") ~ "Woman",
+      T ~ NA_character_
+    ) %>% factor(levels = c("Man", "Woman")),
+    marstat = case_when(
+      gender_marstat %in% c("1", "6") ~ "Single",
+      gender_marstat %in% c("2", "7") ~ "Married",
+      gender_marstat %in% c("3", "8") ~ "Widowed",
+      gender_marstat %in% c("4", "9") ~ "Divorced",
+      gender_marstat %in% c("5", "-") ~ "Seperated",
+      #gender_marstat %in% c("0", "&") ~ "Unknown",
+    ) %>% factor(levels = c("Single", "Married", "Widowed", "Divorced", "Seperated")),
     # Military
     # -----------------
     military = case_when(

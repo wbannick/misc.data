@@ -12,7 +12,7 @@ raw_data <- read_fwf("Data/Internment/RG210.JAPAN.WRA26.txt",
                  assembly_center = c(21),
                  residence = c(22,26),
                  birth_country = c(27),
-                 age_in_japan = c(36),
+                 age_in_japan = c(37),
                  military = c(38),
                  gender_marstat = c(45),
                  race = c(46),
@@ -25,7 +25,8 @@ raw_data <- read_fwf("Data/Internment/RG210.JAPAN.WRA26.txt",
 
 out_data <- raw_data %>%
   transmute(
-    # RESIDENCE
+    # Residence Info
+    # -----------------
     residence_state = str_extract(residence,"[0-9]{2}") %>%
       recode(
         "11" = "Washington",  "12" = "Oregon", "13" = "California", 
@@ -69,6 +70,8 @@ out_data <- raw_data %>%
       str_detect(residence_area, "^[0-9]") ~ as.character(residence_state),
       T ~ residence_area
     ),
+    # Camps
+    # -----------------
     relocation_center = 
       recode(
         relocation_center,
@@ -86,6 +89,8 @@ out_data <- raw_data %>%
       relocation_center %in% c("Granada") ~ "Colorado",
       relocation_center %in% c("Rohwer", "Jerome") ~ "Arkansas"
     ),
+    # Birth Place
+    # -----------------
     birth_place = case_when(
       birth_place < 66 | (birth_place > 69 & birth_place < 75) ~ "United States",
       birth_place > 89 & birth_place < 100 ~ "Japan",
@@ -93,8 +98,8 @@ out_data <- raw_data %>%
       T ~ NA_character_
     ) %>%
       factor(levels = c("United States", "Japan", "Other")),
-    # birthyear/age
-    #--------------
+    # AGE
+    # -----------------
     birth_year = str_trim(birth_year) %>% 
       str_pad(width = 2, pad = "0", side = "left"),
     birth_year = case_when(
@@ -113,7 +118,24 @@ out_data <- raw_data %>%
       age < 60 ~ "45-59",
       age >= 60 ~ "60+"
     ) %>%
-      factor(levels = c("0-17", "18-29", "30-44", "45-59", "60+"))
+      factor(levels = c("0-17", "18-29", "30-44", "45-59", "60+")),
+    # Age in Japan
+    # -----------------
+    # just going to do oldest age
+    age_in_japan = case_when(
+      age_in_japan == "0" ~ "Never Lived in Japan",
+      age_in_japan %in% c("1") ~ "0-9",
+      age_in_japan %in% c("2", "4") ~ "10-19",
+      age_in_japan %in% c("3", "5", "6", "7") ~ "20+",
+      T ~ NA_character_
+    ) %>% factor(levels = c("Never Lived in Japan", "0-9", "10-19", "20+")),
+    # Military
+    # -----------------
+    military = case_when(
+      military %in% c("1", "2") ~ "US Military",
+      military %in% c("3", "4") ~ "Japanese Military",
+      !is.na(military) ~ "No Military Service"
+    ) %>% factor(levels = c("US Military", "Japanese Military", "No Military Service"))
   )
 
 

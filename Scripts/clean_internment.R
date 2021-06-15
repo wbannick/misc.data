@@ -144,6 +144,23 @@ out_data <- raw_data %>%
       gender_marstat %in% c("5", "-") ~ "Seperated",
       #gender_marstat %in% c("0", "&") ~ "Unknown",
     ) %>% factor(levels = c("Single", "Married", "Widowed", "Divorced", "Seperated")),
+    # Race
+    # -----------------
+    # they call it race. perhaps not correct label
+    # 99.8% Japanese
+    race = case_when(
+      race %in% c(3,4,7) ~ "Japanese",
+      race %in% c(5) ~ "Japanese and White",
+      race %in% c(8) ~ "White",
+      race %in% c(1) ~ "Other",
+      race %in% c(2) ~ "White and Other"
+    ) %>% factor(levels = c("Japanese", "Japanese and White", "White",
+                            "White and Other", "Other")),
+    # seems to be Japanese, No Spouse or Unknown. leaving out for now
+    # spouse_race = case_when(
+    #   race %in% c(7, 1, 2) ~ "Japanese",
+    # ) %>% factor(levels = c("Japanese", "Japanese and White", "White",
+    #                         "White and Other", "Other")),
     # Military
     # -----------------
     military = case_when(
@@ -151,9 +168,14 @@ out_data <- raw_data %>%
       military %in% c("3", "4") ~ "Japanese Military",
       !is.na(military) ~ "No Military Service"
     ) %>% factor(levels = c("US Military", "Japanese Military", "No Military Service"))
+    # will leave off here for now...
+    # Education
+    # -----------------
+    # Religion
+    # -----------------
   )
 
 
-
+arrow::write_feather(out_data, "Clean_Data/internment_camps.feather")
 
 

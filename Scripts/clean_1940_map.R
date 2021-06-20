@@ -1,8 +1,10 @@
 library(tidyverse)
 library(sf)
 
-# Read in Map
-# ------------------
+# I. Read in Map
+# ------------------------
+# ------------------------
+
 tmp_fl <- tempfile()
 # map from IPUMS NHGIS, University of Minnesota, www.nhgis.org
 # not pushing to github because not sure if I am allowed to.
@@ -17,8 +19,9 @@ sf_1940 <- sf::read_sf(shp_fl, promote_to_multi = F)
 
 unlink(tmp_fl)
 
-# Recodes
-# ------------------
+# II. Map Recodes
+# ------------------------
+# ------------------------
 
 sf_1940 <- sf_1940 %>%
   filter(
@@ -36,34 +39,19 @@ sf_1940 <- sf_1940 %>%
   )
 
 
-# Join on Sub Regions
-# ------------------
-
-# # not doing city... maybe county
-# county_xwalk <- tribble(
-#   ~residence_code, ~residence_county, ~residencs_subregion,
-#   1311, "Del Norte", "Northwestern Coastal Hills and Valleys",
-#   1312, "Humboldt",  "Northwestern Coastal Hills and Valleys",
-#   1313, "Lake", "Northwestern Coastal Hills and Valleys",
-#   1314, "Mondocino", "Northwestern Coastal Hills and Valleys",
-#   1315, "Napa", "Northwestern Coastal Hills and Valleys",
-#   1316, "Sonoma", "Northwestern Coastal Hills and Valleys",
-#   1317, "Trinity", "Northwestern Coastal Hills and Valleys",
-#   1321, "Alpine/Mono", "Sierra and Northeastern Area",
-#   1322, "Anador", "Sierra and Northeastern Area",
-#   1323, "Calaveras", "Sierra and Northeastern Area",
-#   1324, "El Dorado", "Sierra and Northeastern Area",
-#   1325, "Inyo", "Sierra and Northeastern Area",
-#   1326, "Lacson", "Sierra and Northeastern Area",
-# )
+# III. Creat Subregion XWALK
+# ------------------------
+# ------------------------
 
 sub_region_xwalk <- tibble(
   state = c(
-    rep("California", 58)
-    #rep("Oregon", 36),
-    #rep("Washington", 39)
+    rep("California", 58),
+    rep("Oregon", 36),
+    rep("Washington", 39)
     ),
   sub_region = c(
+    # CALIFORNIA
+    # ------------
     rep("Northwestern Coastal Hills and Valleys", 7),
     rep("Sierra and Northeastern Area", 16),
     rep("Sacramento River Valley", 7),
@@ -75,9 +63,26 @@ sub_region_xwalk <- tibble(
     "Sacramento Metropolitan County",
     "San Jose Metropolitan County",
     rep("Los Angeles Metropolitan Counties", 2),
-    "San Diego Metropolitan County"
+    "San Diego Metropolitan County",
+    # OREGON
+    # ------------
+    rep("Northwestern Area", 12),
+    rep("Southwestern Area", 5),
+    rep("Eastern Wheat Area", 6),
+    rep("Eastern Irrigation and Grasing Area", 11),
+    rep("Portland Metropolitan Counties", 2),
+    # Washington
+    # ------------
+    rep("Western Slope", 5),
+    rep("Western Slope (Inland)", 12),
+    rep("Central and Northeastern Area", 9),
+    rep("Columbia Plateau Wheat Area", 10),
+    rep("Seattle-Tacoma Metropolitan Counties", 2),
+    "Spokane Metropolitan County"
   ),
   county = c(
+    # CALIFORNIA
+    # ------------
     "Del Norte", "Humboldt", "Lake", "Mondocino", "Napa", "Sonoma",
     "Trinity", "Alpine", "Anador", "Calaveras", "El Dorado", "Inyo",
     "Lacson", "Mariposa", "Modoc", "Mono", "Nevada", "Placer", "Plumas",
@@ -87,6 +92,28 @@ sub_region_xwalk <- tibble(
     "Merced", "San Joaquin", "Stanislaus", "Tulare", "Santa Barbara",
     "Ventura", "Imperial", "Riverside", "San Bernardino", "Alameda",
     "Contra Costa", "Marin", "San Francisco", "San Mateo", "Solano",
-    "Sacramento", "Santa Clara", "Los Angeles", "Orange", "San Diego"
+    "Sacramento", "Santa Clara", "Los Angeles", "Orange", "San Diego",
+    # OREGON
+    # ------------
+    "Benton", "Clatsop", "Columbia", "Hood River", "Lane", "Lincoln",
+    "Linn", "Marion", "Polk", "Tillamook", "Washington", "Yamhill", "Coos",
+    "Curry", "Douglas", "Jackson", "Josephine", "Gilliam", "Jefferson", 
+    "Morrow", "Sherman", "Umatilla", "Wasco", "Baker", "Crook", "Deschutes",
+    "Grant", "Harney", "Klamath", "Lake", "Malheur", "Union", "Wallowa",
+    "Wheeler", "Clackamas", "Multnomah",
+    # Washington
+    # ------------
+    "Clallam", "Grays Harbor", "Jefferson", "Pacific", "Wahkiakum", "Clark",
+    "Cowlitz", "Island", "Kitsap", "Lewis", "Mason", "San Juan", "Skagit",
+    "Skamania", "Snohomish", "Thurston", "Whatcom", "Benton", "Chelan",
+    "Ferry", "Kittitas", "Klikatat", "Okanogan", "Pend Oreille", "Stevens",
+    "Yakima", "Adams", "Asotin", "Columbia", "Douglas", "Franklin", "Garfield",
+    "Grant", "Lincoln", "Walla Walla", "Whitman", "King", "Pierce", "Spokane"
   )
 )
+
+# Join Data
+# ------------------------
+# ------------------------
+
+

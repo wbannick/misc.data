@@ -39,7 +39,7 @@ sf_1940 <- sf_1940 %>%
   )
 
 
-# III. Creat Subregion XWALK
+# III. Create Subregion XWALK
 # ------------------------
 # ------------------------
 
@@ -49,7 +49,7 @@ sub_region_xwalk <- tibble(
     rep("Oregon", 36),
     rep("Washington", 39)
     ),
-  sub_region = c(
+  subregion = c(
     # CALIFORNIA
     # ------------
     rep("Northwestern Coastal Hills and Valleys", 7),
@@ -83,9 +83,9 @@ sub_region_xwalk <- tibble(
   county = c(
     # CALIFORNIA
     # ------------
-    "Del Norte", "Humboldt", "Lake", "Mondocino", "Napa", "Sonoma",
-    "Trinity", "Alpine", "Anador", "Calaveras", "El Dorado", "Inyo",
-    "Lacson", "Mariposa", "Modoc", "Mono", "Nevada", "Placer", "Plumas",
+    "Del Norte", "Humboldt", "Lake", "Mendocino", "Napa", "Sonoma",
+    "Trinity", "Alpine", "Amador", "Calaveras", "El Dorado", "Inyo",
+    "Lassen", "Mariposa", "Modoc", "Mono", "Nevada", "Placer", "Plumas",
     "Shasta", "Sierra", "Siskiyou", "Tuolumne", "Butte", "Colusa", "Glenn",
     "Sutter", "Tehama", "Yolo", "Yuba", "Monterey", "San Benito",
     "San Luis Obispo", "Santa Cruz", "Fresno", "Kern", "Kings", "Madera",
@@ -115,5 +115,18 @@ sub_region_xwalk <- tibble(
 # Join Data
 # ------------------------
 # ------------------------
+
+sf_1940 <- sf_1940 %>%
+  left_join(sub_region_xwalk)
+
+sf_subregion <- sf_1940 %>%
+  group_by(state, state_code, sub_region) %>%
+  summarise(
+    geometry = st_union(geometry)
+  )
+
+# not pushing it to github because not sure if allowed to given IPUMS
+sf::write_sf(sf_subregion, "Not for Git/pacific_subregion.gpkg")
+
 
 

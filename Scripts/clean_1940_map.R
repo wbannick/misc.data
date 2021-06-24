@@ -10,7 +10,7 @@ tmp_fl <- tempfile()
 # not pushing to github because not sure if I am allowed to.
 # I mean also it's really big
 # Unzipping here because big file
-unzip("Not For Git/nhgis0001_shapefile_tl2008_us_county_1940.zip", exdir = tmp_fl)
+unzip("Not For Git/Data/nhgis0001_shapefile_tl2008_us_county_1940.zip", exdir = tmp_fl)
 
 shp_fls <- list.files(tmp_fl, full.names = T)
 shp_fl <- shp_fls[str_detect(shp_fls, "\\.shp$")]
@@ -126,7 +126,7 @@ sf_subregion <- sf_1940 %>%
   )
 
 # not pushing it to github because not sure if allowed to given IPUMS
-sf::write_sf(sf_subregion, "Not for Git/pacific_subregion.gpkg")
+sf::write_sf(sf_subregion, "Not for Git/Clean_Data/pacific_subregion.gpkg")
 
 
 

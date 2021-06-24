@@ -1,13 +1,16 @@
 library(tidyverse)
 
-# found using documentation in the Documentation/Internment/102.1DP.pdf
-raw_data <- read_fwf("Data/Internment/RG210.JAPAN.WRA26.txt", 
+# I chose not to include the source data because it includes PII (including full name)
+# I found it in the national archives
+# codebook in documentation: Documentation/Internment/102.1DP.pdf
+raw_data <- read_fwf("Not for Git/Data/RG210.JAPAN.WRA26.txt", 
                skip = 42,
                # there are more columns that could be used
                fwf_cols(
-                 last_name = c(1,10),
-                 first_name = c(11,18),
-                 middle_name = c(19),
+                 # pii and unesseary for my purposes
+                 # last_name = c(1,10),
+                 # first_name = c(11,18),
+                 # middle_name = c(19),
                  relocation_center = c(20),
                  assembly_center = c(21),
                  residence = c(22,26),

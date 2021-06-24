@@ -1,5 +1,6 @@
 library(tidyverse)
 library(arrow)
+library(willbprocessed)
 # clean records data
 records <- arrow::read_feather("Clean_Data/internment_camps.feather")
 
@@ -11,10 +12,14 @@ stats_by_subregion <- records %>%
     ) %>%
   group_by(residence_state, residence_area) %>%
   summarise(
-    n = n()
+    n = n(),
+    US_born = mean(I(birth_place == "United States"), na.rm = T),
+    Japan_born = mean(I(birth_place == "Japan"), na.rm = T)
   ) %>%
   rename(
     "state" = "residence_state",
     "subregion" = "residence_area"
-    )
+  ) %>%
+  mutate(across(matches("_"), as_percent, 1))
+
 

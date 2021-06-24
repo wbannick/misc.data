@@ -43,8 +43,8 @@ out_data <- raw_data %>%
       recode(
         "131" = "Northwestern Coastal Hills and Valleys",
         "132" = "Sierra and Northeastern Area",
-        "133" = "Sacramento Valley",
-        "134" = "Central Costal Hills and Valleys",
+        "133" = "Sacramento River Valley",
+        "134" = "Central Coastal Hills and Valleys",
         "135" = "San Joaquin River Valley",
         "136" = "Santa Barbara-Ventura Area",
         "137" = "Southeastern Desert and Irrigated Valleys",
@@ -60,7 +60,7 @@ out_data <- raw_data %>%
         "125" = "Portland Metropolitan Counties",
         "111" = "Western Slope",
         "112" = "Western Slope (Inland)",
-        "113" = "Cental and Northeastern Area",
+        "113" = "Central and Northeastern Area",
         "114" = "Columbia Plateau Wheat Area",
         "115" = "Seattle-Tacoma Metropolitan Counties",
         "116" = "Spokane Metropolitan County"

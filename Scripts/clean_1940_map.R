@@ -1,10 +1,12 @@
 library(tidyverse)
 library(sf)
+library(arrow)
 
-# I. Read in Map
+# I. Read in Map + Grouped Stats
 # ------------------------
 # ------------------------
 
+# Map!
 tmp_fl <- tempfile()
 # map from IPUMS NHGIS, University of Minnesota, www.nhgis.org
 # not pushing to github because not sure if I am allowed to.
@@ -18,6 +20,10 @@ shp_fl <- shp_fls[str_detect(shp_fls, "\\.shp$")]
 sf_1940 <- sf::read_sf(shp_fl, promote_to_multi = F)
 
 unlink(tmp_fl)
+
+# stats to join to map
+stats_by_subregion <- read_feather("Clean_Data/internment_stats_by_subregion.feather")
+
 
 # II. Map Recodes
 # ------------------------
@@ -112,18 +118,27 @@ sub_region_xwalk <- tibble(
   )
 )
 
-# Join Data
+# Join + Group Data
 # ------------------------
 # ------------------------
 
 sf_1940 <- sf_1940 %>%
+  # join on sub regions (so we can join on stats)
   left_join(sub_region_xwalk)
 
+# group geometries by subregion
 sf_subregion <- sf_1940 %>%
-  group_by(state, state_code, sub_region) %>%
-  summarise(
-    geometry = st_union(geometry)
-  )
+  group_by(state, state_code, subregion) %>%
+  summarise() %>%
+  ungroup() %>%
+  # convert to 4269 crs
+  st_transform(4269) %>%
+  # ... and validate (bay and la are invalid)
+  st_make_valid() %>%
+  # finaly join on the summarized stats
+  # for the concentration camps
+  left_join(stats_by_subregion)
+
 
 # not pushing it to github because not sure if allowed to given IPUMS
 sf::write_sf(sf_subregion, "Not for Git/Clean_Data/pacific_subregion.gpkg")

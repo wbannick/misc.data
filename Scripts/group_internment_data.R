@@ -12,6 +12,7 @@ stats_by_subregion <- records %>%
     ) %>%
   group_by(residence_state, residence_area) %>%
   summarise(
+    # many more stats to add here!!
     n = n(),
     US_born = mean(I(birth_place == "United States"), na.rm = T),
     Japan_born = mean(I(birth_place == "Japan"), na.rm = T)
@@ -22,4 +23,4 @@ stats_by_subregion <- records %>%
   ) %>%
   mutate(across(matches("_"), as_percent, 1))
 
-
+write_feather(stats_by_subregion, "Clean_Data/internment_stats_by_subregion.feather")

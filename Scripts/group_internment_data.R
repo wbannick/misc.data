@@ -14,13 +14,20 @@ stats_by_subregion <- records %>%
   summarise(
     # many more stats to add here!!
     n = n(),
-    US_born = mean(I(birth_place == "United States"), na.rm = T),
-    Japan_born = mean(I(birth_place == "Japan"), na.rm = T)
+    # ties to us/japan
+    us_born = mean(I(birth_place == "United States"), na.rm = T),
+    japan_born = mean(I(birth_place == "Japan"), na.rm = T),
+    never_in_japan = mean(I(age_in_japan == "Never Lived in Japan"), na.rm = T),
+    # camp locations
+    mode_camp = modeest::mfv(relocation_center),
+    percent_mode_camp = mean(I(relocation_center == mode_camp), na.rm = T),
+    mode_state = modeest::mfv(relocation_state),
+    percent_mode_state =  mean(I(relocation_state == mode_state), na.rm = T)
   ) %>%
   rename(
     "state" = "residence_state",
     "subregion" = "residence_area"
   ) %>%
-  mutate(across(matches("_"), as_percent, 1))
+  mutate(across(matches("born|percent|never"), as_percent, 1))
 
 write_feather(stats_by_subregion, "Clean_Data/internment_stats_by_subregion.feather")

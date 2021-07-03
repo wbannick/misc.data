@@ -21,6 +21,8 @@ raw_data <- read_fwf("Not for Git/Data/RG210.JAPAN.WRA26.txt",
                  race = c(46),
                  birth_year = c(47,48),
                  birth_place = c(49,50),
+                 # SS/AR + Japanese Language school
+                 reg_lang_school = c(50,51),
                  educ = c(52),
                  religion = c(54)
                  )
@@ -92,6 +94,7 @@ out_data <- raw_data %>%
       relocation_center %in% c("Granada") ~ "Colorado",
       relocation_center %in% c("Rohwer", "Jerome") ~ "Arkansas"
     ),
+    camp_full = paste(relocation_center, relocation_state, sep = ", "),
     # Birth Place
     # -----------------
     birth_place = case_when(
@@ -122,6 +125,12 @@ out_data <- raw_data %>%
       age >= 60 ~ "60+"
     ) %>%
       factor(levels = c("0-17", "18-29", "30-44", "45-59", "60+")),
+    age3 = case_when(
+      age < 18 ~ "0-17",
+      age < 50 ~ "18-49",
+      age >= 50 ~ "50+"
+    ) %>%
+      factor(levels = c("0-17", "18-49", "50+")),
     # Age in Japan
     # -----------------
     # just going to do oldest age
@@ -176,6 +185,7 @@ out_data <- raw_data %>%
     # -----------------
     # Religion
     # -----------------
+    # I also want to add SS, but I don't understand the coding
   )
 
 

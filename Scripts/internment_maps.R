@@ -10,26 +10,37 @@ sf_sub <- sf::read_sf("Not for Git/Clean_Data/pacific_subregion.gpkg") %>%
     "Percent of Records" = "percent_records",
     "Percent Never Been to Japan" = "never_in_japan",
     "Percent Born in Japan" = "japan_born",
+    "Percent Born in the US" = "us_born",
     "Percent Children" = "under_18",
     "Most Common Camp" = "mode_camp"
   )
-  
 
-tm <- tmap::tm_shape(sf_sub) + 
+
+
+
+# TO DO
+# ALTER BACKGROUNDS?
+# MAYBE PERCENT OF POPULATION
+# can either A put a second layer or B try facet wrappin in RMD
+tm <- 
+  tmap::tm_shape(sf_sub, name = "People Displaced") + 
   tm_polygons(
     "People Displaced",
     id = "subregion",
-    palette = "-viridis",
+    palette = "-magma",
     popup.vars = 
       c(
         "People Displaced",
         "Percent of Records",
         "Percent Never Been to Japan",
-        "Percent Born in Japan",
+        "Percent Born in the US",
         "Percent Children",
         "Most Common Camp"
       ),
     breaks = c(1, 1000, 4000, 10000, 20000, 40000)
-    )
+    ) +
+  tm_layout(earth.boundary = usa_bbox) +
+  tm_view(set.zoom.limits = c(5,10)) +
+  tmap_options(basemaps = c("Esri.WorldGrayCanvas")) 
 
 tmap_save(tm, filename = "Misc/internment_maptest.html")

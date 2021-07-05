@@ -16,8 +16,6 @@ sf_sub <- sf::read_sf("Not for Git/Clean_Data/pacific_subregion.gpkg") %>%
   )
 
 
-
-
 # TO DO
 # ALTER BACKGROUNDS?
 # MAYBE PERCENT OF POPULATION
@@ -37,9 +35,8 @@ tm <-
         "Percent Children",
         "Most Common Camp"
       ),
-    breaks = c(1, 1000, 4000, 10000, 20000, 40000)
+    breaks = c(1, 500, 1000, 4000, 10000, 20000, 40000)
     ) +
-  tm_layout(earth.boundary = usa_bbox) +
   tm_view(set.zoom.limits = c(5,10)) +
   tmap_options(basemaps = c("Esri.WorldGrayCanvas")) 
 

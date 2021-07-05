@@ -1,16 +1,12 @@
 library(tidyverse)
 
-# I chose not to include the source data because it includes PII (including full name)
+# I chose not to include the source data because it includes PII
 # I found it in the national archives
 # codebook in documentation: Documentation/Internment/102.1DP.pdf
 raw_data <- read_fwf("Not for Git/Data/RG210.JAPAN.WRA26.txt", 
                skip = 42,
                # there are more columns that could be used
                fwf_cols(
-                 # pii and unesseary for my purposes
-                 # last_name = c(1,10),
-                 # first_name = c(11,18),
-                 # middle_name = c(19),
                  relocation_center = c(20),
                  assembly_center = c(21),
                  residence = c(22,26),
@@ -73,6 +69,10 @@ out_data <- raw_data %>%
     # if it still starts with a number we'll use state for now
     residence_area = case_when(
       str_detect(residence_area, "^[0-9]") ~ as.character(residence_state),
+      # Group together b/c small numbers
+      residence_area %in%
+        c("Columbia Plateau Wheat Area", "Spokane Metropolitan County") ~ 
+        "Columbia Plateau Wheat Area and Spokane Metropolitan County",
       T ~ residence_area
     ),
     # Camps

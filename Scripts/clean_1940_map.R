@@ -128,6 +128,14 @@ sf_1940 <- sf_1940 %>%
 
 # group geometries by subregion
 sf_subregion <- sf_1940 %>%
+  mutate(
+    # grouping cuz of small numbers
+    subregion = ifelse(
+      subregion %in%
+        c("Columbia Plateau Wheat Area", "Spokane Metropolitan County"),
+      "Columbia Plateau Wheat Area and Spokane Metropolitan County",
+      subregion)
+  ) %>%
   group_by(state, state_code, subregion) %>%
   summarise() %>%
   ungroup() %>%

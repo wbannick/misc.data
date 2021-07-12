@@ -130,11 +130,15 @@ sf_1940 <- sf_1940 %>%
 sf_subregion <- sf_1940 %>%
   mutate(
     # grouping cuz of small numbers
-    subregion = ifelse(
-      subregion %in%
-        c("Columbia Plateau Wheat Area", "Spokane Metropolitan County"),
-      "Columbia Plateau Wheat Area and Spokane Metropolitan County",
-      subregion)
+    subregion = case_when(
+      subregion %in% c(
+        "Columbia Plateau Wheat Area", "Spokane Metropolitan County",
+        "Central and Northeastern Area") ~ "Central and Eastern Washington",
+      str_detect(subregion, "Western Slope") ~ "Western Slope",
+      subregion %in% c("Northwestern Area", "Southwestern Area") ~ "Western Oregon",
+      subregion %in% 
+        c("Eastern Irrigation and Grasing Area", "Eastern Wheat Area") ~ "Eastern Oregon",
+      T ~ subregion)
   ) %>%
   group_by(state, state_code, subregion) %>%
   summarise() %>%

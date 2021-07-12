@@ -12,6 +12,7 @@ raw_data <- read_fwf("Not for Git/Data/RG210.JAPAN.WRA26.txt",
                  residence = c(22,26),
                  birth_country = c(27),
                  age_in_japan = c(37),
+                 len_in_japan = c(35),
                  military = c(38),
                  gender_marstat = c(45),
                  race = c(46),
@@ -75,6 +76,18 @@ out_data <- raw_data %>%
         "Columbia Plateau Wheat Area and Spokane Metropolitan County",
       T ~ residence_area
     ),
+    # UPDATE: so I'm going to keep this more detailed residence_area as residence_area_detail
+    residence_area_detail = residence_area,
+    # and then do a recode that groups together some places in WA and CA with few people
+    residence_area = case_when(
+      residence_area %in% c(
+        "Columbia Plateau Wheat Area and Spokane Metropolitan County", 
+        "Central and Northeastern Area") ~ "Central and Eastern Washington",
+      str_detect(residence_area, "Western Slope") ~ "Western Slope",
+      residence_area %in% c("Northwestern Area", "Southwestern Area") ~ "Western Oregon",
+      residence_area %in% 
+        c("Eastern Irrigation and Grasing Area", "Eastern Wheat Area") ~ "Eastern Oregon",
+      T ~ residence_area),
     # Camps
     # -----------------
     relocation_center = 
@@ -141,6 +154,18 @@ out_data <- raw_data %>%
       age_in_japan %in% c("3", "5", "6", "7") ~ "20+",
       T ~ NA_character_
     ) %>% factor(levels = c("Never Lived in Japan", "0-9", "10-19", "20+")),
+    len_in_japan = case_when(
+      len_in_japan == "0" ~ "None",
+      # should do finer categories if we plan to use this
+      len_in_japan %in% c("1", "2") ~ "Less than 1 year",
+      len_in_japan %in% c("3", "4") ~ "1-10 years",
+      len_in_japan %in% c("5", "6", "7") ~ "More than 10 years",
+      len_in_japan == "8" ~ "Time in another country",
+      T ~ NA_character_
+    ) %>% 
+      factor(levels =  c(
+        "None", "Less than 1 year", "1-10 years", "More than 10 years",
+        "Time in another country")), 
     # Gender + Marstat
     # -----------------
     gender = case_when(

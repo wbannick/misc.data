@@ -1,0 +1,82 @@
+---
+title: "Japanese American Mass Incareration During World War II"
+output: html_document
+---
+
+<style type="text/css">
+
+h1 {
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Helvetica Neue';
+}
+
+h2 {
+ font-family: 'Helvetica Neue';
+}
+
+body{
+ font-family: 'Helvetica Neue';
+ font-size: 16px;
+}
+
+</style>
+
+<br>
+<br>
+
+```{r setup, include=FALSE}
+library(tmap)
+library(tidyverse)
+```
+
+During World War II, the United States Government Incarerated about 120,000 Japanese Americans in concentration camps. The history of racism and zenophobia that lead to the creation of these camps and the conditions of life within is seldom told or taught, even in California where the majority of Japanese American's sent to these camps were from.
+
+The purpose of this post is to raise awareness about the camps and utilize incomplete data from the national archives to help readers visualize the enormity of the transgressions. The pupose of this post is NOT to give an exhaustive history of these shameful actions perpetrated by the American government and FDR administration. Other resources exist for this purpose and do a much better job than I could.
+
+I encourage the reader to visit <a href="https://densho.org/">densho.org</a> as a next step. There are also memouirs of experiences in the camps and books such as _Infamy: The Shocking Story of the Japanese American Internment in World War II_ that aim to ariculate an overview of what happened.
+
+The data I acquired for this study comes from the US National Archives. I have posted cleaned data files on <a href="https://github.com/wbannick">my github</a>. The data has a little over 109,000 rows. Therefore, <b>the data is incomplete</b>. Please keep that in mind when viewing the subsequet analysis I also created a map using this data. I acquired a map of 1940 county boundaries from <a href="www.nhgis.org<">IPUMS NHGIS, University of Minnesota</a>. I merged counties to subregions identified in the documentation for the data from the national archives. I further grouped some regions together because some subregions had very few people. This could lead to some confusion in the maps, particularly in Eastern Washington. There very few people from southeastern Washington in particular. They were grouped in with central Washington to protect personal identifiying information and present more reliable summary statistics.
+
+For my maps I only used data from California, Oregon, and Washington. This data represents 106931 cases or almost 98% of the available data, but there were also Japanese Americans Interned from other states, particularly Hawaii and Arizona.
+
+```{r map_output, echo = FALSE, message = FALSE, warning = FALSE, out.width="100%", out.height= "700px"}
+# some data prep so labels look nicer
+sf_sub <- sf::read_sf(here::here("Not for Git/Clean_Data/pacific_subregion.gpkg")) %>%
+  # recoding names of columns used in this visualization!
+  # keeping others as is so that grouped data is easier to program with
+  rename(
+    # eh may need a better label
+    "People Incarcerated" = "n",
+    "Percent of Records" = "percent_records",
+    "Percent Never Been to Japan" = "never_in_japan",
+    "Percent Born in the US" = "us_born",
+    "Percent Children" = "under_18",
+    "Most Common Camp" = "mode_camp"
+  )
+
+tmap::tmap_mode("view")
+
+# creating the map
+tmap::tm_shape(sf_sub, name = "People Incarcerated") + 
+  tm_polygons(
+    "People Incarcerated",
+    id = "subregion",
+    palette = "-magma",
+    popup.vars = 
+      c(
+        "People Incarcerated",
+        "Percent of Records",
+        "Percent Never Been to Japan",
+        "Percent Born in the US",
+        "Percent Children",
+        "Most Common Camp"
+      ),
+    breaks = c(50, 1000, 4000, 10000, 20000, 40000)
+    ) +
+  tm_view(set.zoom.limits = c(5,10)) +
+  tmap_options(basemaps = c("Esri.WorldGrayCanvas")) 
+
+```
+
+More text here

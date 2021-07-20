@@ -30,15 +30,20 @@ library(tmap)
 library(tidyverse)
 ```
 
-During World War II, the United States Government Incarerated about 120,000 Japanese Americans in concentration camps. The history of racism and zenophobia that lead to the creation of these camps and the conditions of life within is seldom told or taught, even in California where the majority of Japanese American's sent to these camps were from.
+During World War II, the United States Government Incarcerated more than 120,000 Japanese Americans in concentration camps. The history of racism and xenophobia that lead to the creation of these camps and the conditions of life within are seldom discussed or taught, even in California where the majority of Japanese Americans sent to these camps were from.
 
-The purpose of this post is to raise awareness about the camps and utilize incomplete data from the national archives to help readers visualize the enormity of the transgressions. The pupose of this post is NOT to give an exhaustive history of these shameful actions perpetrated by the American government and FDR administration. Other resources exist for this purpose and do a much better job than I could.
+The purpose of this post is to raise awareness about the camps and utilize incomplete data from the National Archives to help readers visualize the scale of this injustice. This post will not give an exhaustive history of the shameful actions perpetrated by actors in American government and FDR administration to actualize these concentration camps. I encourage the reader to visit <a href="https://densho.org/">densho.org</a> as a first step to learning more. There are also memoirs of the experiences of people in the camps and books such as _Infamy: The Shocking Story of the Japanese American Internment in World War II_ that aim to articulate an overview of what happened.
 
-I encourage the reader to visit <a href="https://densho.org/">densho.org</a> as a next step. There are also memouirs of experiences in the camps and books such as _Infamy: The Shocking Story of the Japanese American Internment in World War II_ that aim to ariculate an overview of what happened.
+## The Data
 
-The data I acquired for this study comes from the US National Archives. I have posted cleaned data files on <a href="https://github.com/wbannick">my github</a>. The data has a little over 109,000 rows. Therefore, <b>the data is incomplete</b>. Please keep that in mind when viewing the subsequet analysis I also created a map using this data. I acquired a map of 1940 county boundaries from <a href="www.nhgis.org<">IPUMS NHGIS, University of Minnesota</a>. I merged counties to subregions identified in the documentation for the data from the national archives. I further grouped some regions together because some subregions had very few people. This could lead to some confusion in the maps, particularly in Eastern Washington. There very few people from southeastern Washington in particular. They were grouped in with central Washington to protect personal identifiying information and present more reliable summary statistics.
+The bulk of the data I acquired for this study comes from the US National Archives. I have posted cleaned data files on <a href="https://github.com/wbannick">my github</a>. The data has a little over 109,000 rows. Therefore, <b>the data is incomplete</b>. Please keep that in mind when exploring the subsequent analysis.
 
-For my maps I only used data from California, Oregon, and Washington. This data represents 106931 cases or almost 98% of the available data, but there were also Japanese Americans Interned from other states, particularly Hawaii and Arizona.
+I also created a map using this data. I acquired a map of 1940 county boundaries from <a href="www.nhgis.org">IPUMS NHGIS, University of Minnesota</a>. For my maps I only used data from California, Oregon, and Washington. This data represents 106931 cases or almost 98% of the available data, but there were also Japanese Americans incarcerated from other states, particularly Hawaii and Arizona.
+
+I merged counties to sub-regions identified in the documentation for the data from the National Archives. I further grouped together some sub-regions in which few incarcerated Japanese Americans lived. This allows me to present more reliable summary statistics, but also is somewhat misleading. For example there were relatively fewer people near incarcerated from outside of what is known as the "Exclusion Zone." For the boundaries of this zone as well as other helpful data please explore <a href="https://maps.densho.org/sitesofshame/">Densho's Sites of Shame map</a>. When exploring my map please keep in mind that within the sub-regions presented, fewer people were interned outside the Exclusion Zone.
+
+The map below is colored to reflect the number of Japanese Americans who were incarcerated by the sub-region of their prior residence. Click on any subregion to see more summary statistics for those who had lived in each location.
+
 
 ```{r map_output, echo = FALSE, message = FALSE, warning = FALSE, out.width="100%", out.height= "700px"}
 # some data prep so labels look nicer
@@ -79,4 +84,7 @@ tmap::tm_shape(sf_sub, name = "People Incarcerated") +
 
 ```
 
-More text here
+## Takeaways
+
+Most of the Japanese Americans sent to Concentration Camps lived in California or in the Seattle and Portland Metropolitan Areas. Almost 84% of the people in the dataset with prior residence data were from California. Another 12% were from Seattle or Portland. All Japanese Americans, including American citizens were targeted for the mass removal so this likely largely reflects where the largest populations of Japanese Americans were within the Exclusion Zone. But these trends are revealing because they illuminate how many lives were uprooted the extent to which regions and communities were effected by this forced removal. 
+

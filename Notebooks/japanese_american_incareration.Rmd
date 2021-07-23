@@ -88,3 +88,9 @@ tmap::tm_shape(sf_sub, name = "People Incarcerated") +
 
 Most of the Japanese Americans sent to Concentration Camps lived in California or in the Seattle and Portland Metropolitan Areas. Almost 84% of the people in the dataset with prior residence data were from California. Another 12% were from Seattle or Portland. All Japanese Americans, including American citizens were targeted for the mass removal so this likely largely reflects where the largest populations of Japanese Americans were within the Exclusion Zone. But these trends are revealing because they illuminate how many lives were uprooted the extent to which regions and communities were effected by this forced removal. 
 
+For example when, I look at the sub-regions in the Bay Area and Central Coast, I can't help but wonder how thee places would be different if the tens of thousands of Japanese Americans who were forcibly expelled from the homes in the 1940s were able to remain, retain their property and build generational wealth. The mass incarceration of Japanese Americans has had a profoundly racist effect on the development of the communities in which many of us have lived in California.
+
+Most Japanese Americans in recorded in the dataset were born in the US and over half had never even been to Japan. There is no excuse to imprison an entire group of people based on their race and ethnicity regardless of where they were born, and this analysis will not imply otherwise. This data is a helpful reminder of the composition of the Japanse Americans incaracerated. It is important to remember that in the subset of records represented by this data, that over 47% had never been to a country that they were imprisoned for association with.
+
+
+

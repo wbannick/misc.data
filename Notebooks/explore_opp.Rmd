@@ -50,7 +50,8 @@ acs <- read_feather(here("Clean_Data/acs_bay_cities14.feather"))
 stops <- filter(stops, year == 2014) %>%
   mutate(
     month = format(date, "%M"),
-    # there are some NAs for race let's make them other...
+    # there are very few NAs for Race, based on what I could find out about
+    # the coding I decided to code these as Other; represents a total of 0.5% of rows
     race5 = ifelse(is.na(race), "Other", as.character(race)) %>%
       factor(levels = levels(race)),
     # see if season has an effect...

@@ -1,0 +1,125 @@
+---
+title: "Support for Reparations - Survey Analysis"
+output: html_document
+---
+
+<style type="text/css">
+
+h1 {
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Helvetica Neue';
+}
+
+h2 {
+ font-family: 'Helvetica Neue';
+}
+
+body{
+ font-family: 'Helvetica Neue';
+ font-size: 16px;
+}
+
+</style>
+
+<br>
+<br>
+
+
+
+```{r setup, include=FALSE}
+# for many data tricks!
+library(tidyverse)
+# for a few handy personal functions
+library(willbprocessed)
+# easy calculations on survey data
+library(srvyr)
+# for pretty tables
+library(kableExtra)
+# for paths
+library(here)
+# color palletes
+library(viridis)
+
+```
+
+
+```{r colors, include=FALSE}
+# Colors for plots
+# same colors as first post for consistency
+v_pal <- viridis::viridis(5)
+v_pal8 <- viridis::viridis(8)
+# new colors for reparations support
+magma_pal6 <- viridis::magma(6)
+magma_pal4 <- viridis::magma(4)
+# creating smaller palletes from those ^
+# generations plots
+gen_plot_colors <- c(v_pal[3], v_pal[2], v_pal[1])
+gen6_plot_colors <- c(v_pal8[6], v_pal8[5], v_pal8[4], v_pal8[3], v_pal8[2], v_pal8[1])
+# reparations plots
+rep5_colors <- c(magma_pal6[2],magma_pal6[3], magma_pal6[6], magma_pal6[5], magma_pal6[4])
+rep3_colors <- c(magma_pal4[2], magma_pal4[4], magma_pal4[3])
+
+```
+
+```{r clean_dataset, include=FALSE}
+# data is not public
+df <- readRDS(here("Not For Git/Clean_Data/ras_20210615.RDS")) %>%
+  mutate(
+    # the weight for this dataset
+    weight = weight_rep_unique
+  ) %>%
+  # NAs are those that do not have responses to reparations question
+  filter(!is.na(weight))
+# dummies for if people support reparations
+rep_dummies <- factor_to_dummies(df$reparations)
+
+```
+
+## Half of Americans Are Open To Reparations
+
+```{r section_1_processing, include=FALSE}
+
+#probs could fxn some of this for generations plot
+reparations_breakdown_data <- df %>%
+  select(all_of(c("respondent_id", "weight"))) %>%
+  # so at this point, unique id, weight, and then dummies for reparations question
+  bind_cols(rep_dummies) %>%
+  pivot_longer(cols = matches(" |support|oppose"), names_to = "reparations", values_to = "value") %>%
+  mutate(reparations = factor(reparations, levels = c("Strongly support", "Somewhat support", "Not sure",
+                                                       "Somewhat oppose", "Strongly oppose"))) %>%
+  srvyr::as_survey(weights = weight, ids = respondent_id) %>%
+  srvyr::group_by(reparations) %>%
+  # gets us an easy confidence interval, thanks srvyr!
+  srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
+  mutate(across(all_of(contains("pct")), willbprocessed::as_percent, 1, F)) %>%
+  mutate(
+    Percent = paste0(pct, "%") %>%
+      # maybe make this as feature of the as percent fxn...
+      recode("16%" = "16.0%")
+  )
+
+
+```
+
+```{r reparations_pie, echo=F, fig.width=10, fig.height=7.5, message=F}
+
+
+ggplot(data = reparations_breakdown_data, aes(x="", fill = reparations, y = pct)) + 
+  geom_bar(stat = "identity", color = "black") +
+  geom_text(
+    aes(label = Percent, x =1.6, y = pct),
+    size = 5,
+    position = position_stack(vjust = 0.5),
+    fontface = "bold",
+    color = "black") +
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = rep5_colors) +
+  theme_void() +
+  theme(legend.position = "right",
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20, hjust = 0.5, face = "bold"),
+        text = element_text(family = "Helvetica Neue")) +
+  labs(title = "Support for Reparations", x = "", y = "")
+
+```

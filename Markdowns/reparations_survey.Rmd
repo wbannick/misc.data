@@ -1,5 +1,5 @@
 ---
-title: "Support for Reparations - Survey Analysis"
+title: "Patterns in Support for Reparations - Survey Analysis"
 output: html_document
 ---
 
@@ -83,7 +83,7 @@ rep3_dummies <- factor_to_dummies(df$reparations3)
 
 ## Half of Americans Are Open To Reparations
 
-```{r section_1_processing, include=FALSE}
+```{r reparations_processing, include=FALSE}
 
 #probs could fxn some of this for generations plot
 reparations_breakdown <- df %>%
@@ -131,14 +131,13 @@ ggplot(data = reparations_breakdown, aes(x="", fill = reparations, y = pct)) +
 
 ```
 
-
-```{r}
+```{r rep3_race3_processing, include = FALSE}
 # format the data. similar to above. should probs fxn this
 rep3_race3 <- df %>%
     select(all_of(c("respondent_id", "weight", "race4"))) %>%
     bind_cols(rep3_dummies) %>%
     pivot_longer(cols = matches(" |Support|Oppose"), names_to = "reparations", values_to = "value") %>%
-    mutate(reparations = factor(reparations, levels = c("Support", "Oppose", "Not sure"))) %>%
+    mutate(reparations = factor(reparations, levels = c("Not sure", "Oppose", "Support"))) %>%
     srvyr::as_survey(weights = weight, ids = respondent_id) %>%
     srvyr::group_by(race4, reparations) %>%
     srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
@@ -148,30 +147,76 @@ rep3_race3 <- df %>%
     Percent = paste0(pct, "%"),
   ) %>%
   # error bars are pretty huge
-  filter(race4 != "Other")
+  filter(race4 != "Other") %>%
+  # just so things make a little more sense
+  rename("race3" = "race4")
+
+
+```
+
+
+```{r rep3_race3_bar, fig.width=10, fig.height=7.5, echo=FALSE}
+# format the data. similar to above. should probs fxn this
+rep3_race3 <- df %>%
+    select(all_of(c("respondent_id", "weight", "race4"))) %>%
+    bind_cols(rep3_dummies) %>%
+    pivot_longer(cols = matches(" |Support|Oppose"), names_to = "reparations", values_to = "value") %>%
+    mutate(reparations = factor(reparations, levels = c("Not sure", "Oppose", "Support"))) %>%
+    srvyr::as_survey(weights = weight, ids = respondent_id) %>%
+    srvyr::group_by(race4, reparations) %>%
+    srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
+  mutate(
+    across(all_of(contains("pct")), willbprocessed::as_percent, 1, F),
+    # for labels
+    Percent = paste0(pct, "%"),
+  ) %>%
+  # error bars are pretty huge
+  filter(race4 != "Other") %>%
+  # just so things make a little more sense
+  rename("race3" = "race4")
 
   
+ggplot(data = rep3_race3) +
+  # the parameters for the bar plot
+  geom_bar(
+    aes(x = race3, y = pct, fill = reparations),
+    color = "black",
+    stat = "identity",
+    position = position_dodge(width = 0.9)
+    ) +
+  # making it width wise
+  coord_flip() +
+  # the paramters for the text
+  geom_text(
+    # if I want to put it at the end
+    # aes(x = race3, y = pct + 5, label = Percent, group = reparations),
+    aes(x = race3, y = (pct/2), label = Percent, group = reparations),
+    #position = position_stack(vjust = 0.5),
+    position = position_dodge(width = 0.9),
+    color = "black",
+    fontface = "bold",
+ 
+  ) +
+  # now the error bars
+  geom_errorbar(
+    aes(x = race3, ymin = pct_low, ymax = pct_upp, group = reparations),
+    width = 0.2,
+    position = position_dodge(width = 0.9)
+    ) +
+  # colors for the bars
+  scale_fill_manual(values = rep3_colors,  breaks = c("Support", "Not sure","Oppose")) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  # theme
+  theme_minimal() +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20, hjust = 0.5, face = "bold"),
+        axis.text.x= element_blank(),
+        text = element_text(family = "Helvetica Neue")) +
+  labs(title = "Reparations Support by Race", x = "", y = "")
 
-# 
-# rep_race3_plot <- ggplot(data = reparations_race3_data) + 
-#   #to do convert this and get conf intervals..
-#   geom_bar(stat = "identity", aes(x = race3, y = pct, fill = reparations), color = "black") +
-#   coord_flip() +
-#   #facet_wrap(~survey, ncol = 1, scales = "free_y") +
-#   geom_text(
-#     aes(x = race3, y = pct, label = pct_label, group = reparations),
-#     position = position_stack(vjust = 0.5),
-#     color = "black", fontface = "bold"
-#   ) +
-#   scale_fill_manual(values = rep3_colors,  breaks = c("Support", "Not sure","Oppose")) +
-#   scale_y_continuous(labels = function(x) paste0(x, "%")) + 
-#   theme_minimal() +
-#   theme(legend.position = "top",
-#         legend.title = element_blank(),
-#         plot.title = element_text(size = 20, hjust = 0.5, face = "bold"),
-#         axis.text.x= element_blank(),
-#         text = element_text(family = "Raleway")) +
-#   labs(title = "Reparations Support by Race", x = "", y = "")
-
+# let's play with plotly displays perhaps
+# if i wanna use plotly..
+# plotly::ggplotly(tmp)
 
 ```

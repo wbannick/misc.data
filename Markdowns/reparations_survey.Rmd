@@ -60,7 +60,37 @@ gen6_plot_colors <- c(v_pal8[6], v_pal8[5], v_pal8[4], v_pal8[3], v_pal8[2], v_p
 rep5_colors <- c(magma_pal6[2],magma_pal6[3], magma_pal6[6], magma_pal6[5], magma_pal6[4])
 rep3_colors <- c(magma_pal4[2], magma_pal4[4], magma_pal4[3])
 
+
 ```
+
+```{r functions, include=FALSE}
+# the font for this post
+post_font <- "Helvetica Neue"
+
+# decreasing copy-paste for similar pies
+one_var_pie <- function(df, varname, color_pal){
+  ggplot(data = df, aes(x="", fill = .data[[varname]], y = pct)) + 
+  geom_bar(stat = "identity", color = "black") +
+  geom_text(
+    aes(label = Percent, x = 1.6, y = pct),
+    size = 5,
+    position = position_stack(vjust = 0.5),
+    fontface = "bold",
+    color = "black") +
+  # to make it pie chart
+  coord_polar(theta = "y") +
+  scale_fill_manual(values = color_pal) +
+  # no axes
+  theme_void() +
+  theme(legend.position = "right",
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20, hjust = 0.5, face = "bold"),
+        text = element_text(family = post_font))
+  
+}
+
+```
+
 
 ```{r clean_dataset, include=FALSE}
 # data is not public
@@ -109,24 +139,7 @@ reparations_breakdown <- df %>%
 
 ```{r reparations_pie, echo=F, fig.width=10, fig.height=7.5, message=F}
 
-# the plot
-ggplot(data = reparations_breakdown, aes(x="", fill = reparations, y = pct)) + 
-  geom_bar(stat = "identity", color = "black") +
-  geom_text(
-    aes(label = Percent, x =1.6, y = pct),
-    size = 5,
-    position = position_stack(vjust = 0.5),
-    fontface = "bold",
-    color = "black") +
-  # to make it pie chart
-  coord_polar(theta = "y") +
-  scale_fill_manual(values = rep5_colors) +
-  # no axes
-  theme_void() +
-  theme(legend.position = "right",
-        legend.title = element_blank(),
-        plot.title = element_text(size = 20, hjust = 0.5, face = "bold"),
-        text = element_text(family = "Helvetica Neue")) +
+one_var_pie(reparations_breakdown, 'reparations', rep5_colors) +
   labs(title = "Support for Reparations", x = "", y = "")
 
 ```
@@ -156,26 +169,6 @@ rep3_race3 <- df %>%
 
 
 ```{r rep3_race3_bar, fig.width=10, fig.height=7.5, echo=FALSE}
-# format the data. similar to above. should probs fxn this
-rep3_race3 <- df %>%
-    select(all_of(c("respondent_id", "weight", "race4"))) %>%
-    bind_cols(rep3_dummies) %>%
-    pivot_longer(cols = matches(" |Support|Oppose"), names_to = "reparations", values_to = "value") %>%
-    mutate(reparations = factor(reparations, levels = c("Not sure", "Oppose", "Support"))) %>%
-    srvyr::as_survey(weights = weight, ids = respondent_id) %>%
-    srvyr::group_by(race4, reparations) %>%
-    srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
-  mutate(
-    across(all_of(contains("pct")), willbprocessed::as_percent, 1, F),
-    # for labels
-    Percent = paste0(pct, "%"),
-  ) %>%
-  # error bars are pretty huge
-  filter(race4 != "Other") %>%
-  # just so things make a little more sense
-  rename("race3" = "race4")
-
-  
 ggplot(data = rep3_race3) +
   # the parameters for the bar plot
   geom_bar(
@@ -216,7 +209,28 @@ ggplot(data = rep3_race3) +
   labs(title = "Reparations Support by Race", x = "", y = "")
 
 # let's play with plotly displays perhaps
-# if i wanna use plotly..
+# if i wanna use plotly... it's take more than this
 # plotly::ggplotly(tmp)
 
 ```
+
+```{r include=FALSE, generations_processing}
+
+# generations_breakdown <- df %>%
+#   select(all_of(c("respondent_id", "weight"))) %>%
+#   bind_cols(gen_dummies) %>%
+#   pivot_longer(cols = matches(" |support|oppose"), names_to = "generations", values_to = "value") %>%
+#   mutate(generations = factor(generations, levels = c("Strongly agree", "Somewhat agree",
+#                                                        "Prefer not to say", "Neither agree nor disagree",
+#                                                        "Somewhat disagree", "Strongly disagree"))) %>%
+#   srvyr::as_survey(weights = weight, ids = respondent_id) %>%
+#   srvyr::group_by(generations) %>%
+#   srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
+#   mutate(across(all_of(contains("pct")), willbprocessed::as_percent, 1, F)) %>%
+#   mutate(
+#     Percent = paste0(pct, "%")
+#   )
+
+
+```
+

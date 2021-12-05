@@ -88,6 +88,30 @@ one_var_pie <- function(df, varname, color_pal){
         text = element_text(family = post_font))
   
 }
+# THIS IS GOOD, IMPLIMENT TIME
+format_plot_data <- function(df, dummies, varname, var_levels, group_vars = c()){
+  df %>%
+    # select only cols we need, if no group_vars provided it will just do id and weight
+    select(all_of(c("respondent_id", "weight", group_vars))) %>%
+    bind_cols(dummies) %>%
+    pivot_longer(
+      # patterns based on our use cases. not robust lol
+      cols = matches(" |Support|Oppose|Agree|Disagree"),
+      names_to = varname,
+      values_to = "value") %>%
+    # levels so right orders in plots
+    mutate(!!varname := factor(.data[[varname]], levels = var_levels)) %>%
+    # thanks for making this easy srvyr!
+    srvyr::as_survey(weights = weight, ids = respondent_id) %>%
+    srvyr::group_by_at(c(group_vars, varname)) %>%
+    srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
+  mutate(
+    # round * 100
+    across(all_of(contains("pct")), willbprocessed::as_percent, 1, F),
+    # for labels
+    Percent = paste0(pct, "%"),
+  )
+}
 
 ```
 
@@ -115,21 +139,15 @@ rep3_dummies <- factor_to_dummies(df$reparations3)
 
 ```{r reparations_processing, include=FALSE}
 
-#probs could fxn some of this for generations plot
-reparations_breakdown <- df %>%
-  select(all_of(c("respondent_id", "weight"))) %>%
-  # so at this point, unique id, weight, and then dummies for reparations question
-  bind_cols(rep_dummies) %>%
-  pivot_longer(cols = matches(" |support|oppose"), names_to = "reparations", values_to = "value") %>%
-  mutate(reparations = factor(reparations, levels = c("Strongly support", "Somewhat support", "Not sure",
-                                                       "Somewhat oppose", "Strongly oppose"))) %>%
-  srvyr::as_survey(weights = weight, ids = respondent_id) %>%
-  srvyr::group_by(reparations) %>%
-  # gets us an easy confidence interval, thanks srvyr!
-  srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
-  mutate(across(all_of(contains("pct")), willbprocessed::as_percent, 1, F)) %>%
+reparations_breakdown <- format_plot_data(
+  df, 
+  dummies = rep_dummies,
+  varname = "reparations",
+  var_levels = c("Strongly support", "Somewhat support", "Not sure",
+    "Somewhat oppose", "Strongly oppose")
+  ) %>%
   mutate(
-    Percent = paste0(pct, "%") %>%
+    Percent = Percent %>%
       # maybe make this as feature of the as percent fxn...
       recode("16%" = "16.0%")
   )

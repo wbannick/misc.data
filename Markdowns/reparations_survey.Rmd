@@ -54,8 +54,8 @@ magma_pal6 <- viridis::magma(6)
 magma_pal4 <- viridis::magma(4)
 # creating smaller palletes from those ^
 # generations plots
-gen_plot_colors <- c(v_pal[3], v_pal[2], v_pal[1])
-gen6_plot_colors <- c(v_pal8[6], v_pal8[5], v_pal8[4], v_pal8[3], v_pal8[2], v_pal8[1])
+gen3_colors <- c(v_pal[3], v_pal[2], v_pal[1])
+gen6_colors <- c(v_pal8[6], v_pal8[5], v_pal8[4], v_pal8[3], v_pal8[2], v_pal8[1])
 # reparations plots
 rep5_colors <- c(magma_pal6[2],magma_pal6[3], magma_pal6[6], magma_pal6[5], magma_pal6[4])
 rep3_colors <- c(magma_pal4[2], magma_pal4[4], magma_pal4[3])
@@ -132,6 +132,8 @@ df <- readRDS(here("Not For Git/Clean_Data/ras_20210615.RDS")) %>%
 rep_dummies <- factor_to_dummies(df$reparations)
 # dummies for what support, oppose, not sure
 rep3_dummies <- factor_to_dummies(df$reparations3)
+# dummies for generations categories
+gen_dummies <- factor_to_dummies(df$generations)
 
 ```
 
@@ -164,18 +166,12 @@ one_var_pie(reparations_breakdown, 'reparations', rep5_colors) +
 
 ```{r rep3_race3_processing, include = FALSE}
 # format the data. similar to above. should probs fxn this
-rep3_race3 <- df %>%
-    select(all_of(c("respondent_id", "weight", "race4"))) %>%
-    bind_cols(rep3_dummies) %>%
-    pivot_longer(cols = matches(" |Support|Oppose"), names_to = "reparations", values_to = "value") %>%
-    mutate(reparations = factor(reparations, levels = c("Not sure", "Oppose", "Support"))) %>%
-    srvyr::as_survey(weights = weight, ids = respondent_id) %>%
-    srvyr::group_by(race4, reparations) %>%
-    srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
-  mutate(
-    across(all_of(contains("pct")), willbprocessed::as_percent, 1, F),
-    # for labels
-    Percent = paste0(pct, "%"),
+rep3_race3 <-format_plot_data(
+  df, 
+  dummies = rep3_dummies,
+  varname = "reparations",
+  var_levels = c("Not sure", "Oppose", "Support"),
+  group_vars = "race4"
   ) %>%
   # error bars are pretty huge
   filter(race4 != "Other") %>%
@@ -234,21 +230,21 @@ ggplot(data = rep3_race3) +
 
 ```{r include=FALSE, generations_processing}
 
-# generations_breakdown <- df %>%
-#   select(all_of(c("respondent_id", "weight"))) %>%
-#   bind_cols(gen_dummies) %>%
-#   pivot_longer(cols = matches(" |support|oppose"), names_to = "generations", values_to = "value") %>%
-#   mutate(generations = factor(generations, levels = c("Strongly agree", "Somewhat agree",
-#                                                        "Prefer not to say", "Neither agree nor disagree",
-#                                                        "Somewhat disagree", "Strongly disagree"))) %>%
-#   srvyr::as_survey(weights = weight, ids = respondent_id) %>%
-#   srvyr::group_by(generations) %>%
-#   srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
-#   mutate(across(all_of(contains("pct")), willbprocessed::as_percent, 1, F)) %>%
-#   mutate(
-#     Percent = paste0(pct, "%")
-#   )
+generations_breakdown <- format_plot_data(
+  df, 
+  dummies = gen_dummies,
+  varname = "generations",
+  var_levels = 
+    c("Strongly agree", "Somewhat agree", "Prefer not to say",
+      "Neither agree nor disagree", "Somewhat disagree", "Strongly disagree")
+  ) 
 
 
 ```
 
+```{r generations_pie, echo=F, fig.width=10, fig.height=7.5, message=F}
+
+one_var_pie(generations_breakdown, 'generations', gen6_colors) +
+  labs(title = "Agreement with Generations Statement", x = "", y = "")
+
+```

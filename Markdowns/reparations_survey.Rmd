@@ -113,6 +113,19 @@ format_plot_data <- function(df, dummies, varname, var_levels, group_vars = c())
   )
 }
 
+# creating table's for reparations breakdown
+hr40_tabs <- function(srvyr_df){
+  srvyr_df %>%
+  srvyr::summarise(
+    Yes = survey_mean(I(aware_hr40 == "Yes"), vartype = "ci", na.rm = T),
+    No = survey_mean(I(aware_hr40 == "No"), vartype = "ci", na.rm = T)
+    ) %>%
+    #for now cuz such big error bars
+    mutate(across(all_of(matches("Yes|No")), as_percent, 1, T)) %>% 
+    select(-all_of(matches("upp|low")))
+}
+
+
 ```
 
 
@@ -141,6 +154,9 @@ rep_dummies <- factor_to_dummies(df$reparations)
 rep3_dummies <- factor_to_dummies(df$reparations3)
 # dummies for generations categories
 gen_dummies <- factor_to_dummies(df$generations)
+
+# srvyr version of the df
+srvyr_df <-  srvyr::as_survey(df, weights = weight, ids = respondent_id)
 
 ```
 
@@ -304,48 +320,24 @@ ggplot(data = gen3_rep3) +
 
 
 ```{r hr40_table, echo=FALSE}
-# maybe a table's a little lazy here tbh
-# 
-# srvyr_df <-  srvyr::as_survey(df, weights = weight, ids = respondent_id)
-# 
-# 
-# tmp_tbl <- srvyr_df %>%  
-#   srvyr::group_by(rep_support) %>%
-#   srvyr::summarise(
-#     Yes = survey_mean(I(aware_hr40 == "Yes"), vartype = "ci", na.rm = T),
-#     No = survey_mean(I(aware_hr40 == "No"), vartype = "ci", na.rm = T)
-#     ) %>%
-#     #for now cuz such big error bars
-#     mutate(across(all_of(matches("Yes|No")), as_percent, 1, T)) %>%
-#   transmute(
-#     `Support for Reparations` = rep_support,
-#     Yes,
-#     No
-#   )
-# 
-# tmp_tbl2 <- srvyr_df %>%
-#   srvyr::summarise(
-#     Yes = survey_mean(I(aware_hr40 == "Yes"), vartype = "ci", na.rm = T),
-#     No = survey_mean(I(aware_hr40 == "No"), vartype = "ci", na.rm = T)
-#     ) %>%
-#     #for now cuz such big error bars
-#     mutate(across(all_of(matches("Yes|No")), as_percent, 1, T)) %>%
-#   transmute(
-#    `Support for Reparations` = "All",
-#     Yes,
-#     No
-#   )
-# 
-# 
-# tmp_tbl %>%
-#   bind_rows(tmp_tbl2) %>%
-#   kableExtra::kable(
-#     caption = "<center><strong>Awareness of HR40 by Support for Reparations</strong></center>",
-#     align = c("l", "c", "c"),
-#     table.attr = "style='width:70%;'"
-#     ) %>%
-#   add_header_above(c(" " = 1, "Aware of HR40" = 2)) %>%
-#   kableExtra::kable_paper(html_font = "Raleway")
+# first broken down by reparations support
+hr40_bkdwn <- srvyr::group_by(srvyr_df, reparations3) %>%
+  hr40_tabs() %>%
+  rename("Support for Reparations" = reparations3)
+# then overall
+hr40_all <- hr40_tabs(srvyr_df) %>%
+  mutate(`Support for Reparations` = "All")
+
+# and then together as one html table
+hr40_bkdwn %>%
+  bind_rows(hr40_all) %>%
+  kableExtra::kable(
+    caption = "<center><strong>Awareness of HR40 by Support for Reparations</strong></center>",
+    align = c("l", "c", "c"),
+    table.attr = "style='width:70%;'"
+    ) %>%
+  add_header_above(c(" " = 1, "Aware of HR40" = 2)) %>%
+  kableExtra::kable_paper(html_font = "Helvetica Neue")
 
 ```
 

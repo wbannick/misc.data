@@ -125,6 +125,13 @@ df <- readRDS(here("Not For Git/Clean_Data/ras_20210615.RDS")) %>%
     # going from 5 categories to 3
     reparations3 = str_extract(reparations,"support|oppose|Not sure") %>% str_to_sentence() %>%
       factor(levels = c("Support", "Oppose", "Not sure")),
+    # generations 3 cat
+    generations3 = 
+      recode(as.character(generations), "Strongly agree" = "Agree", "Somewhat agree" = "Agree", 
+                        "Neither agree nor disagree" = "Other", "Somewhat disagree" = "Disagree", 
+                        "Strongly disagree" = "Disagree", 
+                        "Prefer not to say" = "Other") %>%
+      factor(levels = c("Agree", "Other", "Disagree"))
   ) %>%
   # NAs are those that do not have responses to reparations question
   filter(!is.na(weight))
@@ -248,3 +255,97 @@ one_var_pie(generations_breakdown, 'generations', gen6_colors) +
   labs(title = "Agreement with Generations Statement", x = "", y = "")
 
 ```
+
+```{r include=FALSE}
+
+gen3_rep3 <- format_plot_data(
+  df, 
+  dummies = rep3_dummies,
+  varname = "reparations",
+  var_levels = c("Not sure", "Oppose", "Support"),
+  group_vars = "generations3"
+  ) %>%
+  mutate(
+    reparations = factor(as.character(reparations), levels = c("Support", "Not sure", "Oppose")),
+    pct_label = round(pct),
+    #for better spacing in plot labels
+    pct_label = paste0("   ", pct_label, "%")
+  )
+
+
+```
+
+```{r echo=F, fig.width=10, fig.height=7.5, message=F}
+
+
+ggplot(data = gen3_rep3) +
+  geom_bar(stat = "identity", aes(x = reparations, y = pct, fill = generations3),
+           position = "dodge") +
+  scale_fill_manual(values = gen3_colors) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  geom_errorbar(aes(x = reparations, ymin = pct_low, ymax = pct_upp, group = generations3),
+                width = 0.2, position = position_dodge(width = 0.9)) +
+  geom_text(
+    aes(x = reparations, y = pct_upp + 5, label = pct_label, group = generations3),
+    position = position_dodge(width = 0.9),
+    size = 5,
+    fontface = "bold",
+    color = "black"
+    ) +
+  theme_minimal() +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20, hjust = 0.5, face = "bold"),
+        text = element_text(family = "Helvetica Neue")) +
+  labs(title = "Support for Reparations By Generations Statement", x = "", y = "")
+
+
+```
+
+
+```{r hr40_table, echo=FALSE}
+# maybe a table's a little lazy here tbh
+# 
+# srvyr_df <-  srvyr::as_survey(df, weights = weight, ids = respondent_id)
+# 
+# 
+# tmp_tbl <- srvyr_df %>%  
+#   srvyr::group_by(rep_support) %>%
+#   srvyr::summarise(
+#     Yes = survey_mean(I(aware_hr40 == "Yes"), vartype = "ci", na.rm = T),
+#     No = survey_mean(I(aware_hr40 == "No"), vartype = "ci", na.rm = T)
+#     ) %>%
+#     #for now cuz such big error bars
+#     mutate(across(all_of(matches("Yes|No")), as_percent, 1, T)) %>%
+#   transmute(
+#     `Support for Reparations` = rep_support,
+#     Yes,
+#     No
+#   )
+# 
+# tmp_tbl2 <- srvyr_df %>%
+#   srvyr::summarise(
+#     Yes = survey_mean(I(aware_hr40 == "Yes"), vartype = "ci", na.rm = T),
+#     No = survey_mean(I(aware_hr40 == "No"), vartype = "ci", na.rm = T)
+#     ) %>%
+#     #for now cuz such big error bars
+#     mutate(across(all_of(matches("Yes|No")), as_percent, 1, T)) %>%
+#   transmute(
+#    `Support for Reparations` = "All",
+#     Yes,
+#     No
+#   )
+# 
+# 
+# tmp_tbl %>%
+#   bind_rows(tmp_tbl2) %>%
+#   kableExtra::kable(
+#     caption = "<center><strong>Awareness of HR40 by Support for Reparations</strong></center>",
+#     align = c("l", "c", "c"),
+#     table.attr = "style='width:70%;'"
+#     ) %>%
+#   add_header_above(c(" " = 1, "Aware of HR40" = 2)) %>%
+#   kableExtra::kable_paper(html_font = "Raleway")
+
+```
+

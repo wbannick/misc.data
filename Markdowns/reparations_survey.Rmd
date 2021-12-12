@@ -162,10 +162,21 @@ srvyr_df <-  srvyr::as_survey(df, weights = weight, ids = respondent_id)
 ```
 
 About half of Americans either support or are not sure if they support the US government giving financial compensation to the descendants of enslaved people. While a majority of white people oppose reparations, a majority of Black Americans and a thin plurality of Hispanic people support them. Furthermore a majority of Americans who acknowledge lasting effects of slavery and discrimination on Black Americans support reparations, while those that deny this reality oppose reparations by an overwhelming majority. Together, these patterns suggest that the appetite for reparations is significant and significant portions of the population are open to the financial compensation of enslaved people.
+<br>
+
+## Disclaimer
+
+The data for this project comes from a multi-wave survey project I conducted while at YouGov. When I left, I was allowed to take the data, graphics and write-ups I had worked on to further analyze the data and post it here on my own website. <i>All of the views expressed in this write-up are my own</i>. They do not reflect the views or opinions of YouGov.
+<br>
 
 ## Half of Americans Are Open To Reparations
 
-YouGov fielded three waves of a national survey between December and June to gauge respondents’ awareness of systemic racism and level of support for policies that aim to promote racial equity. These three waves have a combined N of a unique 2,700 respondents. The sample was weighted to be nationally representative on age, gender, race, education, census region, voter registration, news interest, and 2016 presidential vote. Weights ranged from 0.03 to 6.02, with a mean of 1, SD of 0.83 and a MOE of +/- 2.45 percent In this survey we asked respondents about their view on reparations.
+While at YouGov, I fielded three waves of a national survey between December 2020 and June 2021 to gauge Americans’ awareness of systemic racism and level of support for policies that aim to promote racial equity.
+
+This sample has a combined N of a unique 2,700 respondents. It was weighted to be nationally representative on age, gender, race, education, census region, voter registration, news interest, and 2016 presidential vote. Weights ranged from 0.03 to 6.02, with a mean of 1, SD of 0.83 and a MOE of +/- 2.45 percent. All graphics and tables incorporate these weights.
+
+In this survey, I asked respondents about their view on reparations for slavery. I chose to explicitly gauge support for reparations given to the descendents of enslaved people rather than asking about reparations for both slavery and centuries of discriminatory policy. Were I to run this again, I would like to adjust the wording to see how such a change would affect the patterns of support discussed in the remainder of this post.
+<br>
 
 ```
 Would you support the United States giving financial compensation to the individual descendants of enslaved people?
@@ -175,10 +186,7 @@ Would you support the United States giving financial compensation to the individ
  <4> Strongly oppose
  <5> Not sure
 ```
-
-
-
-
+<br>
 
 ```{r reparations_processing, include=FALSE}
 
@@ -205,7 +213,8 @@ one_var_pie(reparations_breakdown, 'reparations', rep5_colors) +
 
 ```
 
-Overall, about half of Americans (51 percent) oppose reparations, while a little over 31 percent support them and 18 percent are not sure. The large level of uncertainty is likely in part due to the question’s design. I was attempting to ascertain general attitudes towards reparations as a concept rather than to measure support for a specific plan or for the term “Reparations” itself. Perhaps, the large level of uncertainty suggests that a significant percent of Americans are open to reparations but would need more details as to how they would be structured. And while a plurality of people do oppose reparations, about half of Americans do not oppose them, and a closer look at the data reveals some illuminating patterns.
+Overall, about half of Americans (51 percent) oppose reparations, while a little over 31 percent support them and 18 percent are not sure. The large level of uncertainty is likely in part due to the question’s design. I was attempting to ascertain general attitudes towards reparations for slavery as a concept rather than to measure support for a specific plan or for the term “Reparations” itself. Perhaps, the large level of uncertainty suggests that a significant percent of Americans are open to reparations but would need more details as to how they would be structured. And while a plurality of people do oppose reparations, about half of Americans are not opposed to them. And a closer look at the data reveals some illuminating patterns.
+<br>
 
 ## Pluralities of Black and Hispanic People Support Reparations
 
@@ -270,9 +279,12 @@ ggplot(data = rep3_race3) +
         text = element_text(family = "Helvetica Neue")) +
   labs(title = "Reparations Support by Race", x = "", y = "")
 
-# let's play with plotly displays perhaps
-# if i wanna use plotly... it's take more than this
-# plotly::ggplotly(tmp)
+# let's play with plotly displays perhaps. 
+# ^I was gonna do some interactive plotly graphics with some significant differences
+# but I think this is good for now.
+
+# Last thing! re order some levels here so alphabetical and legend makes more sense
+
 
 ```
 

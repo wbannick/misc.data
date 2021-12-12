@@ -108,7 +108,7 @@ format_plot_data <- function(df, dummies, varname, var_levels, group_vars = c())
     srvyr::summarise(pct = survey_mean(value, vartype = "ci", na.rm = T)) %>%
   mutate(
     # round * 100
-    across(all_of(contains("pct")), willbprocessed::as_percent, 1, F),
+    across(all_of(contains("pct")), willbprocessed::as_percent, 0, F),
     # for labels
     Percent = paste0(pct, "%"),
   )
@@ -122,7 +122,7 @@ hr40_tabs <- function(srvyr_df){
     No = survey_mean(I(aware_hr40 == "No"), vartype = "ci", na.rm = T)
     ) %>%
     #for now cuz such big error bars
-    mutate(across(all_of(matches("Yes|No")), as_percent, 1, T)) %>% 
+    mutate(across(all_of(matches("Yes|No")), as_percent, 0, T)) %>% 
     select(-all_of(matches("upp|low")))
 }
 
@@ -196,11 +196,6 @@ reparations_breakdown <- format_plot_data(
   varname = "reparations",
   var_levels = c("Strongly support", "Somewhat support", "Not sure",
     "Somewhat oppose", "Strongly oppose")
-  ) %>%
-  mutate(
-    Percent = Percent %>%
-      # maybe make this as feature of the as percent fxn...
-      recode("16%" = "16.0%")
   )
 
 
@@ -233,7 +228,9 @@ rep3_race3 <-format_plot_data(
   # error bars are pretty huge
   filter(race4 != "Other") %>%
   # just so things make a little more sense
-  rename("race3" = "race4")
+  rename("race3" = "race4") %>%
+  # reverse alphabetical so it will show in Alphabetical
+  mutate(race3 = factor(race3, levels = c("White", "Hispanic", "Black")))
 
 
 ```

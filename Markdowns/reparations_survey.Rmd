@@ -208,13 +208,13 @@ one_var_pie(reparations_breakdown, 'reparations', rep5_colors) +
 
 ```
 
-Overall, about half of Americans (51 percent) oppose reparations, while a little over 31 percent support them and 18 percent are not sure. The large level of uncertainty is likely in part due to the question’s design. I was attempting to ascertain general attitudes towards reparations for slavery as a concept rather than to measure support for a specific plan or for the term “Reparations” itself. Perhaps, the large level of uncertainty suggests that a significant percent of Americans are open to reparations but would need more details as to how they would be structured. And while a plurality of people do oppose reparations, about half of Americans are not opposed to them. And a closer look at the data reveals some illuminating patterns.
+Overall, about half of Americans oppose reparations, while a little over 31 percent support them and 18 percent are not sure. The large level of uncertainty is likely in part due to the question’s design. I was attempting to ascertain general attitudes towards reparations for slavery as a concept rather than to measure support for a specific plan or for the term “Reparations” itself. Perhaps, the large level of uncertainty suggests that a significant percent of Americans are open to reparations but would need more details as to how they would be structured. And while a plurality of people do oppose reparations, about half of Americans are not opposed to them. And a closer look at the data reveals some illuminating patterns.
 <br>
 
 ## Pluralities of Black and Hispanic People Support Reparations
 
-Patterns of support for reparations differ significantly across racial groups. Overall, a plurality of about 43 percent of People of Color support reparations, while a majority of 61 percent of white people oppose them. Within People of Color, sixty percent of Black Americans support reparations, and only 19 percent oppose them. Support among Hispanic Americans is more split. A thin plurality supports reparations, but about equally as many oppose them or are not sure about them.
-
+Patterns of support for reparations differ significantly across racial groups. Overall, a plurality of about 43 percent of People of Color support reparations, while a majority of 61 percent of white people oppose them. Within People of Color, sixty percent of Black Americans support reparations, and only 19 percent oppose them. Support among Hispanic Americans is more split. A thin plurality supports reparations, but about equally as many oppose them or are not sure about them. And unfortunately, the confidence intervals on these values are fairly large.
+<br>
 
 ```{r rep3_race3_processing, include = FALSE}
 # format the data. similar to above. should probs fxn this
@@ -296,7 +296,7 @@ In the same survey, respondents were asked to indicate the degree to which they 
 ```
 Generations of slavery and discrimination have created conditions that make it difficult for African Americans to achieve economic mobility
 ```
-
+<br>
 
 ```{r include=FALSE, generations_processing}
 
@@ -320,7 +320,7 @@ one_var_pie(generations_breakdown, 'generations', gen6_colors) +
 ```
 
 A plurality of Americans (about 43 percent) agree with the statement, and about 37 percent disagree with it. The majority of those who agree with the statement (55 percent) indicated support for reparations. Alternatively, a vast majority of those who disagree with the statement on the generational effects of slavery and discrimination (87 percent) oppose reparations. Only 25 percent of those who agree with the generational challenges of slavery oppose reperations, while 20 percent remain unsure.
-
+<br>
 
 ```{r include=FALSE}
 
@@ -368,9 +368,10 @@ ggplot(data = gen3_rep3) +
 
 ```
 
-I believe this data reveals three patterns: (1) There is significant support for reparations among those who acknowledge the generational effects of slavery and discrimination on Black Americans. (2) Those who refuse to acknowledge the generational effects of slavery oppose reparations in great numbers. There is very little uncertainty among this group, even though the description of compensation used in the question was vague. (3) Many of those who do not disagree with the generations statement are not sure as to whether or not they support reparations in the manner described in the question.
+I believe this data reveals three patterns: (1) There is significant support for reparations for slavery among those who acknowledge the generational effects of slavery and discrimination on Black Americans. (2) Those who refuse to acknowledge the generational effects of slavery and discrimination oppose reparations in great numbers. There is very little uncertainty among this group, even though the description of compensation used in the question was vague. (3) Many of those who do not disagree with the generations statement are not sure as to whether or not they support reparations in the manner described in the question.
 
-I think that most Americans who are able to admit that slavery has lead to generations of sytemic discrimination are ready to consider reparations and unpack what they might look like. Scholars and activists are offering concrete plans and there is even an act in Congress to establish a Commision to look into reparations called H.R. 40. Unfortunately, few people are aware of it.
+I think that most Americans who are able to admit that slavery has lead to generations of sytemic discrimination are ready to consider reparations and unpack what they might look like. Scholars and activists are offering concrete plans and there is a bill in Congress to establish a Commision to look into reparations called H.R. 40. Unfortunately, few people are aware of it.
+<br>
 
 ```{r hr40_table, echo=FALSE}
 # first broken down by reparations support
@@ -394,11 +395,11 @@ hr40_bkdwn %>%
 
 ```
 
-We asked panelists if they were aware of HR40 and only 16 percent were. Only about 23 percent of respondents who indicated that they support reparations in our survey know of HR40 and only 14 percent of those not sure if the support reparations know of it. Clearly, there is more of an appetite for reparations than the attention they receive from our government and media.
+The survey asked panelists if they were aware of HR40 and only 16 percent were. Furthermore, only about 23 percent of respondents who indicated that they support reparations in our survey also indicated they were aware of HR40 and only 14 percent of those not sure if they support reparations were aware of it. Clearly, there is more of an appetite for reparations than the attention they receive from our government and media.
 
 ## Conclusion
 
-About half of Americans oppose reparations, while over 31 percent support them and about 18 percent are not sure. But a closer look at patterns of support reveals some insightful trends. A majority of white respondents oppose reparations, but a majority of Black respondents support them and Hispanic respondents are split with a thin plurality supporting reparations. Thereby, the people who benefit most from the racist systems born out of slavery are much more likely to oppose financial compensation for slavery.
+About half of Americans oppose reparations for slavery, while over 31 percent support them and about 18 percent are not sure. But a closer look at patterns of support reveals some insightful trends. A majority of white respondents oppose reparations, but a majority of Black respondents support them and Hispanic respondents are split with a thin plurality supporting reparations. Thereby, the people who benefit most from the racist systems born out of slavery are much more likely to oppose financial compensation for slavery.
 
 The majority of those who acknowledge that slavery and discrimination have made it more difficult for Black Americans to achieve economic mobility support reparations, while almost 90% of those who disagree with this reality oppose reparations. This distorts overall trends in support for reparations. People who want to deny the lasting effects of slavery in this country oppose reparations in great numbers, but among other respondents, there is a lot oof support as well as a lot of uncertainty. It is time for the US government to make concrete plans for financial compensation to the families of enslaved people. There is a considerable appetite for consideration in this country.
 

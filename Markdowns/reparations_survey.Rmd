@@ -28,7 +28,6 @@ body{
 
 
 ```{r setup, include=FALSE}
-# CURRENTLY THE WRITEUP IS INACCURATE. IT WAS WHAT I was GOING TO PUT OUT THRU YOUGOV, BUT IT WAS NOT CLEARED AND WILL BE EDITED TO GO OUT ON MY SITE 
 # for many data tricks!
 library(tidyverse)
 # for a few handy personal functions
@@ -370,7 +369,7 @@ ggplot(data = gen3_rep3) +
 
 I believe this data reveals three patterns: (1) There is significant support for reparations for slavery among those who acknowledge the generational effects of slavery and discrimination on Black Americans. (2) Those who refuse to acknowledge the generational effects of slavery and discrimination oppose reparations in great numbers. There is very little uncertainty among this group, even though the description of compensation used in the question was vague. (3) Many of those who do not disagree with the generations statement are not sure as to whether or not they support reparations in the manner described in the question.
 
-I think that most Americans who are able to admit that slavery has lead to generations of sytemic discrimination are ready to consider reparations and unpack what they might look like. Scholars and activists are offering concrete plans and there is a bill in Congress to establish a Commision to look into reparations called H.R. 40. Unfortunately, few people are aware of it.
+I think that most Americans who are able to admit that slavery has lead to generations of sytemic discrimination are ready to consider reparations and unpack what they might look like. Scholars and activists are offering concrete plans and there is a bill in Congress to establish a Commision to look into reparations called H.R. 40. Unfortunately, relatively few people are aware of it.
 <br>
 
 ```{r hr40_table, echo=FALSE}
@@ -395,14 +394,10 @@ hr40_bkdwn %>%
 
 ```
 
-The survey asked panelists if they were aware of HR40 and only 16 percent were. Furthermore, only about 23 percent of respondents who indicated that they support reparations in our survey also indicated they were aware of HR40 and only 14 percent of those not sure if they support reparations were aware of it. Clearly, there is more of an appetite for reparations than the attention they receive from our government and media.
+The survey asked panelists if they were aware of HR40 and only 16 percent were. Furthermore, only about 23 percent of respondents who indicated that they support reparations in our survey also indicated they were aware of HR40 and only 14 percent of those not sure if they support reparations were aware of it. Awareness does seem to be growing overtime, but there is clearly more of an appetite for reparations than the attention they receive from our government and media.
 
-## Conclusion
+## Looking Forward
 
-About half of Americans oppose reparations for slavery, while over 31 percent support them and about 18 percent are not sure. But a closer look at patterns of support reveals some insightful trends. A majority of white respondents oppose reparations, but a majority of Black respondents support them and Hispanic respondents are split with a thin plurality supporting reparations. Thereby, the people who benefit most from the racist systems born out of slavery are much more likely to oppose financial compensation for slavery.
-
-The majority of those who acknowledge that slavery and discrimination have made it more difficult for Black Americans to achieve economic mobility support reparations, while almost 90% of those who disagree with this reality oppose reparations. This distorts overall trends in support for reparations. People who want to deny the lasting effects of slavery in this country oppose reparations in great numbers, but among other respondents, there is a lot oof support as well as a lot of uncertainty. It is time for the US government to make concrete plans for financial compensation to the families of enslaved people. There is a considerable appetite for consideration in this country.
-
-There is an act in Congress to explore reparations. I hope posts like this can raise awareness about patterns of support for reparations and raise awareness about HR40 and push for speedy progress on making reparations a reality.
+I hope that this project helps reinforce the reality that there is a significant appetite for reparations. I believe the patterns discussed in this post are compelling and I hope that posts and discussion like this can help focus dialogue on reparations and hopefully apply pressure to pass HR 40 and make reparations for slavery and disicrimination a priority.
 
 

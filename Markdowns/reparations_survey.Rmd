@@ -159,15 +159,15 @@ srvyr_df <-  srvyr::as_survey(df, weights = weight, ids = respondent_id)
 
 ```
 
-About half of Americans either support or are not sure if they support the US government giving financial compensation to the descendants of enslaved people. While a majority of white people oppose reparations, a majority of Black Americans and a thin plurality of Hispanic people support them. Furthermore, a majority of Americans who acknowledge lasting effects of slavery and discrimination on Black Americans support reparations, while those that deny this reality oppose reparations by an overwhelming majority. Together, these patterns suggest that the appetite for reparations is significant and large groups of Americans are open to the financial compensation of enslaved people.
+About half of Americans either support or are not sure if they support the US government giving financial compensation to the descendants of enslaved people. While a majority of white people oppose reparations, a majority of Black Americans and a thin plurality of Hispanic people support them. Furthermore, a majority of Americans who acknowledge lasting effects of slavery and discrimination on Black Americans support reparations, while those that deny this reality oppose reparations by an overwhelming majority. Together, these patterns suggest that the appetite for reparations is significant and large groups of Americans support to the financial compensation of enslaved people.
 
 ## Disclaimer
 
-The data for this project comes from a multi-wave survey project I conducted while at YouGov. When I left, I was allowed to take the data, graphics and write-ups I had worked on to further analyze the data and post it here on my own website. <i>All of the views expressed in this write-up are my own</i>. They do not reflect the views or opinions of YouGov.
+The data for this project comes from a multi-wave survey project I conducted while at YouGov. When I left, I was allowed to take the data, graphics, and write-ups I had worked on to further analyze the data and post it here on my own website. <i>All of the views expressed in this write-up are my own</i>. They do not reflect the views or opinions of YouGov.
 
 ## Half of Americans Are Open To Reparations
 
-While at YouGov, I fielded three waves of a national survey between December 2020 and June 2021 to gauge Americans’ awareness of systemic racism and level of support for policies that aim to promote racial equity.
+While at YouGov, I fielded three waves of a national survey between December 2020 and June 2021 to gauge Americans’ awareness of systemic racism and the level of support for policies that aim to promote racial equity.
 
 This sample has a combined N of a unique 2,700 respondents. It was weighted to be nationally representative on age, gender, race, education, census region, voter registration, news interest, and 2016 presidential vote. Weights ranged from 0.03 to 6.02, with a mean of 1, SD of 0.83 and a MOE of +/- 2.45 percent. All graphics and tables incorporate these weights.
 
@@ -198,7 +198,7 @@ reparations_breakdown <- format_plot_data(
 
 ```
 
-```{r reparations_pie, echo=F, fig.width=10, fig.height=7.5, message=F}
+```{r reparations_pie, echo=F, fig.width=10, fig.height=6, message=F}
 
 one_var_pie(reparations_breakdown, 'reparations', rep5_colors) +
   labs(title = "Support for Reparations", x = "", y = "")
@@ -310,7 +310,7 @@ generations_breakdown <- format_plot_data(
 
 ```
 
-```{r generations_pie, echo=F, fig.width=10, fig.height=7.5, message=F}
+```{r generations_pie, echo=F, fig.width=10, fig.height=6, message=F}
 
 one_var_pie(generations_breakdown, 'generations', gen6_colors) +
   labs(title = "Agreement with Generations Statement", x = "", y = "")

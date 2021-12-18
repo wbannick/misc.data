@@ -1,5 +1,5 @@
 ---
-title: "Patterns in Support for Reparations - Survey Analysis"
+title: "Patterns in Support for Reparations"
 output: html_document
 ---
 
@@ -163,7 +163,7 @@ About half of Americans either support or are not sure if they support the US go
 
 ## Disclaimer
 
-The data for this project comes from a multi-wave survey project I conducted while at YouGov. When I left, I was allowed to take the data, graphics, and write-ups I had worked on to further analyze the data and post it here on my own website. <i>All of the views expressed in this write-up are my own</i>. They do not reflect the views or opinions of YouGov.
+The data for this project comes from a multi-wave survey project I conducted while at YouGov. When I left, I was allowed to take the data, graphics, and write-ups I had worked on to further analyze the data and post it here on my own website. <i>All of the views expressed in this post are my own</i>. They do not reflect the views or opinions of YouGov.
 
 ## Half of Americans Are Open To Reparations
 
@@ -401,4 +401,6 @@ The survey asked panelists if they were aware of HR40 and only 16 percent were. 
 
 ## Looking Forward
 
-I hope that this project helps reinforce the reality that there is a significant appetite for reparations. I believe the patterns discussed in this post are compelling and I hope that discussions like this one can help focus dialogue on reparations and hopefully apply pressure to pass HR 40 and make reparations for slavery and disicrimination a priority.
+I hope that this project helps reinforce the reality that there is a significant appetite for reparations. It is not an exhaustive study and there are many ways that a survey like this could be tweaked, amended and re-run to more deeply explore people's opinions on reparations. For example, I would like to test different wordings for the question that measures an individual's opinions on reparations. In particular, I would like to see how support levels fluctuate for specific plans in order to ascertain which elements of reparations are most appealing to groups of people. 
+
+Yet, I do believe the patterns discussed in this post alone are compelling and I hope that discussions like this one can help focus dialogue on reparations and apply pressure to pass HR 40 and make reparations for slavery and disicrimination a priority.

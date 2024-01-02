@@ -1,0 +1,171 @@
+---
+title: "Battlefront II Randomized Playlist Generator"
+author: William Bannick
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+<style>                     
+.navbar {
+  background-color:#267CB9;
+}
+
+.navbar-brand {
+  display: grid;
+  margin: auto;
+  padding: 5px;
+}
+
+.navbar-author {
+  margin-left: 0px;
+}
+
+body{
+ font-family: 'Helvetica Neue';
+}
+
+.navbar .navbar-brand {
+  text-decoration: none;
+  font-weight: bold;
+}
+
+</style>                    
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(dplyr)
+library(willbprocessed)
+library(shiny)
+```
+
+
+```{r data, include=FALSE}
+# full list with xbox dlc
+matches_list <- list(
+  "Bespin" = c("conquest", "ctf", "assault"),
+  "Coruscant" = c("conquest", "ctf", "assault"),
+  "Dagobah" = c("conquest", "ctf"),
+  "Death Star" = c("conquest", "ctf"),
+  "Endor" = c("conquest", "ctf", "hunt"),
+  "Felucia" = c("conquest", "ctf"),
+  "Genosis" = c("conquest", "ctf", "hunt"),
+  "Hoth" = c("conquest", "ctf", "hunt"),
+  "Jabba's Palace" = c("conquest", "ctf"),
+  "Kamino" = c("conquest", "ctf"),
+  "Kashyyyk" = c("conquest", "ctf", "hunt", "assault"),
+  "Mos Eisley" = c("conquest", "ctf", "hunt", "assault"),
+  "Mustafar" = c("conquest", "ctf"),
+  "Mygeeto" = c("conquest", "ctf", "assault"),
+  "Naboo" = c("conquest", "ctf", "hunt", "assault"),
+  "Polis Massa" = c("conquest", "ctf"),
+  "Rhen Var Citadel" = c("conquest", "ctf", "assault"),
+  "Rhen Var Harbor" = c("conquest", "ctf", "hunt", "assault"),
+  "Tantive IV" = c("conquest", "ctf"),
+  "Utapau" = c("conquest", "ctf"),
+  "Yavin 4" = c("conquest", "ctf"),
+  "Yavin 4 Arena" = c("conquest", "ctf2", "ctf1", "assualt")
+)
+# original map list
+matches_list_no_dlc <- list(
+  "Coruscant" = c("conquest", "ctf"),
+  "Dagobah" = c("conquest", "ctf"),
+  "Death Star" = c("conquest", "ctf"),
+  "Endor" = c("conquest", "ctf", "hunt"),
+  "Felucia" = c("conquest", "ctf"),
+  "Genosis" = c("conquest", "ctf", "hunt"),
+  "Hoth" = c("conquest", "ctf", "hunt"),
+  "Jabba's Palace" = c("conquest", "ctf"),
+  "Kamino" = c("conquest", "ctf"),
+  "Kashyyyk" = c("conquest", "ctf", "hunt"),
+  "Mos Eisley" = c("conquest", "ctf", "hunt", "assault"),
+  "Mustafar" = c("conquest", "ctf"),
+  "Mygeeto" = c("conquest", "ctf"),
+  "Naboo" = c("conquest", "ctf", "hunt"),
+  "Polis Massa" = c("conquest", "ctf"),
+  "Tantive IV" = c("conquest", "ctf"),
+  "Utapau" = c("conquest", "ctf"),
+  "Yavin 4" = c("conquest", "ctf")
+)
+```
+
+
+
+```{r palylist_functions, include=FALSE}
+# a function for getting a random selection of maps
+get_maps <- function(matches_list, num_maps, replace = TRUE) {
+  map_position <- sample(length(matches_list), num_maps, replace = replace)
+  matches_list[map_position]
+}
+
+# a function for getting a battle when provided a location and types of battles
+get_battle <- function(battle_types, location) {
+  # select battle type
+  battle_type <- sample(battle_types, 1)
+  # for now just do it for all. only need to use if necessary
+  era <- case_when(
+    (battle_type %in% c("assault", "hunt") |
+      location %in% c("Hoth", "Endor", "Genosis")) ~ NA_character_,
+    T ~ sample(c("clone wars", "galactic civil war"), 1)
+  )
+
+  tibble(
+    Location = stringr::str_to_title(location),
+    `Battle Type` = stringr::str_to_title(battle_type),
+    Era = stringr::str_to_title(era)
+  )
+}
+
+# function that creates a playlist which is tibble with columns for battle locations, battle types, and eras
+random_playlist <- function(num_battles, dlc = TRUE, replace_battles = TRUE) {
+  matches <- matches_list
+  if (dlc == FALSE) {
+    matches <- matches_list_no_dlc
+  }
+  maps <- get_maps(matches, num_battles, replace_battles)
+
+  purrr::map2_dfr(maps, names(maps), function(battle_types, location) {
+    get_battle(battle_types, location)
+  })
+}
+```
+
+Row
+-----------------------------------------------------------------------
+
+```{r include=FALSE}
+# determining whether or not to allow duplicates
+dupe_input_choices <- reactive({
+  num_maps <- ifelse(input$dlc == "Yes", length(matches_list), length(matches_list_no_dlc))
+  dplyr::case_when(input$num_battles <= num_maps ~ c("Yes", "No"), T ~ "Yes") %>%
+    unique()
+})
+```
+
+
+```{r}
+# panel that allows users to select playlist criteria
+sidebarPanel(
+  selectInput("dlc", "Include DLC Maps and Modes:", choices = c("Yes", "No"), width = "100%"),
+  numericInput("num_battles", "Number of Battles:", value = 1, min = 1, width = "100%"),
+  renderUI({
+    selectInput("dupe_maps", "Allow for Duplicate Maps:", choices = dupe_input_choices(), selected = "Yes", width = "100%")
+  }),
+  actionButton("create", "Generate Playlist")
+)
+```
+
+```{r}
+# generating the playlist
+playlist <- eventReactive(input$create, {
+  random_playlist(input$num_battles, input$dlc == "Yes", input$dupe_maps == "Yes")
+})
+
+# displaying the table
+DT::renderDT(playlist(), options = list(dom = "tlp"))
+
+# To-do
+# - add ability to add/remove courses from table
+# - change button color
+```
